@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte interactive des résultats électoraux</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        #header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        #main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        #sidebar {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        select:focus, button:hover {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .stats-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .candidate-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .candidate-item {
+            padding: 8px;
+            margin: 4px 0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .candidate-item:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+        
+        .candidate-item.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        
+        .radio-group {
+            margin: 10px 0;
+        }
+        
+        .radio-group label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading i {
+            animation: spin 1s infinite linear;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        #file-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8d7da;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #28a745;
+            padding: 10px;
+            border-radius: 5px;
+            background: #d4edda;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1><i class="fas fa-map-marked-alt"></i> Carte interactive des résultats électoraux</h1>
+    </div>
+    
+    <div id="main-container">
+        <div id="sidebar">
+            <div class="control-group">
+                <h3><i class="fas fa-upload"></i> Chargement des données</h3>
+                <input type="file" id="file-input" accept=".json, .csv">
+                <div id="file-info"></div>
+            </div>
+            
+            <div class="control-group" id="candidates-panel" style="display: none;">
+                <h3><i class="fas fa-users"></i> Sélectionner un candidat</h3>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="display-mode" value="candidates" checked> 
+                        <i class="fas fa-chart-bar"></i> Visualiser par candidat
+                    </label>
+                    <label>
+                        <input type="radio" name="display-mode" value="participation"> 
+                        <i class="fas fa-percent"></i> Taux de participation
+                    </label>
+                    <label>
+                        <input type="radio" name="display-mode" value="comparison"> 
+                        <i class="fas fa-balance-scale"></i> Comparaison
+                    </label>
+                </div>
+                
+                <div id="candidate-list" class="candidate-list"></div>
+                
+                <div class="stats-card" id="stats"></div>
+                
+                <div class="legend">
+                    <h4>Légende</h4>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: #00ff00;"></div>
+                        <span>Faible intensité</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: #ffff00;"></div>
+                        <span>Moyenne intensité</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: #ff0000;"></div>
+                        <span>Haute intensité</span>
+                    </div>
+                </div>
+                
+                <button id="refresh-map"><i class="fas fa-sync-alt"></i> Actualiser la carte</button>
+                <button id="reset-view"><i class="fas fa-globe"></i> Réinitialiser la vue</button>
+            </div>
+        </div>
+        
+        <div id="map"></div>
+    </div>
+    
+    <script>
+        // Configuration initiale
+        let map;
+        let currentHeatLayer = null;
+        let markers = [];
+        let currentData = null;
+        let candidatesList = [];
+        let currentCandidate = null;
+        
+        // Initialiser la carte
+        function initMap() {
+            map = L.map('map').setView([48.8566, 2.3522], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+        
+        // Charger les données depuis un fichier JSON
+        function loadJSON(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    processData(data);
+                } catch (error) {
+                    showError('Erreur de parsing JSON : ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Charger les données depuis un fichier CSV
+        function loadCSV(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const lines = e.target.result.split('\n');
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    
+                    const data = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        if (!lines[i].trim()) continue;
+                        
+                        const values = lines[i].split(',').map(v => v.trim());
+                        const row = {};
+                        
+                        headers.forEach((header, index) => {
+                            if (header === 'Geo') {
+                                try {
+                                    row[header] = JSON.parse(values[index]);
+                                } catch {
+                                    row[header] = values[index];
+                                }
+                            } else {
+                                row[header] = isNaN(values[index]) ? values[index] : Number(values[index]);
+                            }
+                        });
+                        
+                        data.push(row);
+                    }
+                    
+                    processData(data);
+                } catch (error) {
+                    showError('Erreur de parsing CSV : ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Traiter les données chargées
+        function processData(data) {
+            // Identifier les candidats (champs numériques)
+            const firstItem = Array.isArray(data) ? data[0] : data.results?.[0] || data;
+            
+            candidatesList = Object.keys(firstItem)
+                .filter(key => {
+                    if (key.toLowerCase().includes('nom') || 
+                        key.toLowerCase().includes('name') ||
+                        key.toLowerCase().includes('bureau')) return false;
+                    
+                    const value = firstItem[key];
+                    return typeof value === 'number' && 
+                           !['inscrits', 'votants', 'nuls', 'blancs', 'exprimes', 'latitude', 'longitude']
+                               .includes(key.toLowerCase());
+                });
+            
+            if (candidatesList.length === 0) {
+                // Chercher dans un sous-objet
+                const resultsObj = firstItem.resultats_candidats || firstItem.results || firstItem.statistiques;
+                if (resultsObj) {
+                    candidatesList = Object.keys(resultsObj)
+                        .filter(key => typeof resultsObj[key] === 'number');
+                }
+            }
+            
+            currentData = data;
+            
+            document.getElementById('candidates-panel').style.display = 'block';
+            document.getElementById('file-info').innerHTML = 
+                `<span class="success"><i class="fas fa-check"></i> ${data.length} bureaux chargés, ${candidatesList.length} candidats trouvés</span>`;
+            
+            updateCandidateList();
+            updateMap('candidates', candidatesList[0]);
+        }
+        
+        // Mettre à jour la liste des candidats
+        function updateCandidateList() {
+            const container = document.getElementById('candidate-list');
+            container.innerHTML = '';
+            
+            candidatesList.forEach(candidate => {
+                const div = document.createElement('div');
+                div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
+                div.textContent = candidate;
+                div.onclick = () => {
+                    document.querySelectorAll('.candidate-item').forEach(el => 
+                        el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    currentCandidate = candidate;
+                    updateStats(candidate);
+                    
+                    const mode = document.querySelector('input[name="display-mode"]:checked').value;
+                    updateMap(mode, candidate);
+                };
+                container.appendChild(div);
+            });
+            
+            if (candidatesList.length > 0 && !currentCandidate) {
+                currentCandidate = candidatesList[0];
+                document.querySelector('.candidate-item')?.classList.add('selected');
+            }
+        }
+        
+        // Mettre à jour les statistiques
+        function updateStats(candidate) {
+            if (!currentData || !candidate) return;
+            
+            let totalVoix = 0;
+            let maxVoix = 0;
+            let maxBureau = '';
+            
+            currentData.forEach(bureau => {
+                let voix = 0;
+                
+                if (bureau.resultats_candidats && bureau.resultats_candidats[candidate]) {
+                    voix = bureau.resultats_candidats[candidate];
+                } else if (bureau.results && bureau.results[candidate]) {
+                    voix = bureau.results[candidate];
+                } else if (bureau[candidate]) {
+                    voix = bureau[candidate];
+                } else if (bureau.statistiques && bureau.statistiques[candidate]) {
+                    voix = bureau.statistiques[candidate];
+                }
+                
+                totalVoix += voix;
+                if (voix > maxVoix) {
+                    maxVoix = voix;
+                    maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
+                }
+            });
+            
+            document.getElementById('stats').innerHTML = `
+                <h4>Statistiques - ${candidate}</h4>
+                <p><strong>Total voix:</strong> ${totalVoix}</p>
+                <p><strong>Moyenne par bureau:</strong> ${Math.round(totalVoix / currentData.length)}</p>
+                <p><strong>Meilleur bureau:</strong> ${maxBureau} (${maxVoix} voix)</p>
+            `;
+        }
+        
+        // Mettre à jour la carte
+        function updateMap(mode, candidate) {
+            if (currentHeatLayer) {
+                map.removeLayer(currentHeatLayer);
+            }
+            
+            // Nettoyer les anciens markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            const heatData = [];
+            
+            currentData.forEach(bureau => {
+                // Récupérer les coordonnées
+                let coords = null;
+                
+                if (bureau.coordonnees) {
+                    coords = bureau.coordonnees;
+                } else if (bureau.Geo) {
+                    coords = bureau.Geo;
+                } else if (bureau.latitude && bureau.longitude) {
+                    coords = [bureau.latitude, bureau.longitude];
+                }
+                
+                if (coords && coords.length >= 2) {
+                    // Récupérer la valeur selon le mode
+                    let value = 0;
+                    
+                    if (mode === 'candidates' && candidate) {
+                        if (bureau.resultats_candidats && bureau.resultats_candidats[candidate]) {
+                            value = bureau.resultats_candidats[candidate];
+                        } else if (bureau.results && bureau.results[candidate]) {
+                            value = bureau.results[candidate];
+                        } else if (bureau[candidate]) {
+                            value = bureau[candidate];
+                        } else if (bureau.statistiques && bureau.statistiques[candidate]) {
+                            value = bureau.statistiques[candidate];
+                        }
+                    } else if (mode === 'participation') {
+                        const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits;
+                        const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants;
+                        if (inscrits && votants) {
+                            value = (votants / inscrits) * 100;
+                        }
+                    } else if (mode === 'comparison' && candidatesList.length >= 2) {
+                        // Ratio entre deux premiers candidats
+                        const cand1 = bureau[candidatesList[0]] || 0;
+                        const cand2 = bureau[candidatesList[1]] || 1;
+                        value = cand1 / (cand2 || 1);
+                    }
+                    
+                    if (value > 0) {
+                        heatData.push([coords[0], coords[1], value]);
+                    }
+                    
+                    // Ajouter un marker avec popup
+                    const marker = L.circleMarker([coords[0], coords[1]], {
+                        radius: 5,
+                        color: 'blue',
+                        fillOpacity: 0.5
+                    }).bindPopup(`
+                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
+                        ${bureau.address || bureau.Adresse || ''}<br>
+                        <b>Voix ${candidate || ''}:</b> ${value}<br>
+                        <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
+                    `);
+                    
+                    marker.addTo(map);
+                    markers.push(marker);
+                }
+            });
+            
+            // Ajouter la couche de chaleur
+            if (heatData.length > 0) {
+                const maxValue = Math.max(...heatData.map(d => d[2]));
+                const normalizedData = heatData.map(d => [
+                    d[0], 
+                    d[1], 
+                    d[2] / maxValue // Normalisation
+                ]);
+                
+                currentHeatLayer = L.heatLayer(normalizedData, {
+                    radius: 25,
+                    blur: 15,
+                    maxZoom: 17,
+                    gradient: {
+                        0.2: 'blue',
+                        0.4: 'cyan',
+                        0.6: 'lime',
+                        0.8: 'yellow',
+                        1.0: 'red'
+                    }
+                }).addTo(map);
+            }
+            
+            // Centrer la carte sur les données
+            if (heatData.length > 0) {
+                const centerLat = heatData.reduce((sum, d) => sum + d[0], 0) / heatData.length;
+                const centerLng = heatData.reduce((sum, d) => sum + d[1], 0) / heatData.length;
+                map.setView([centerLat, centerLng], 13);
+            }
+        }
+        
+        // Afficher une erreur
+        function showError(message) {
+            document.getElementById('file-info').innerHTML = 
+                `<span class="error"><i class="fas fa-exclamation-triangle"></i> ${message}</span>`;
+        }
+        
+        // Gestionnaire d'upload de fichier
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.name.endsWith('.json')) {
+                loadJSON(file);
+            } else if (file.name.endsWith('.csv')) {
+                loadCSV(file);
+            } else {
+                showError('Format non supporté. Utilisez JSON ou CSV.');
+            }
+        });
+        
+        // Gestionnaire des modes d'affichage
+        document.querySelectorAll('input[name="display-mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const mode = this.value;
+                if (mode === 'candidates') {
+                    document.getElementById('candidate-list').style.display = 'block';
+                    updateMap(mode, currentCandidate);
+                } else {
+                    document.getElementById('candidate-list').style.display = 'none';
+                    updateMap(mode);
+                }
+            });
+        });
+        
+        // Bouton actualiser
+        document.getElementById('refresh-map').addEventListener('click', function() {
+            const mode = document.querySelector('input[name="display-mode"]:checked').value;
+            updateMap(mode, currentCandidate);
+        });
+        
+        // Bouton réinitialiser la vue
+        document.getElementById('reset-view').addEventListener('click', function() {
+            if (currentData && currentData.length > 0) {
+                const firstBureau = currentData[0];
+                let coords = null;
+                
+                if (firstBureau.coordonnees) {
+                    coords = firstBureau.coordonnees;
+                } else if (firstBureau.Geo) {
+                    coords = firstBureau.Geo;
+                } else if (firstBureau.latitude && firstBureau.longitude) {
+                    coords = [firstBureau.latitude, firstBureau.longitude];
+                }
+                
+                if (coords) {
+                    map.setView([coords[0], coords[1]], 13);
+                }
+            }
+        });
+        
+        // Initialisation
+        initMap();
+        
+        // Exemple de données par défaut (pour test)
+        setTimeout(() => {
+            const defaultData = [
+                {
+                    "Bureau": "101",
+                    "Geo": [49.2584032, 4.0322568],
+                    "ROSE": 5,
+                    "CORADEL": 28,
+                    "FRIGOUT": 54,
+                    "QUENARD": 103,
+                    "ROBINET": 425,
+                    "MURA": 4,
+                    "LANG": 50,
+                    "Inscrits": 1120,
+                    "Votants": 682
+                },
+                {
+                    "Bureau": "102",
+                    "Geo": [49.2604032, 4.0352568],
+                    "ROSE": 2,
+                    "CORADEL": 15,
+                    "FRIGOUT": 54,
+                    "QUENARD": 97,
+                    "ROBINET": 360,
+                    "MURA": 1,
+                    "LANG": 53,
+                    "Inscrits": 1048,
+                    "Votants": 587
+                },
+                {
+                    "Bureau": "103",
+                    "Geo": [49.2554032, 4.0302568],
+                    "ROSE": 8,
+                    "CORADEL": 20,
+                    "FRIGOUT": 45,
+                    "QUENARD": 110,
+                    "ROBINET": 380,
+                    "MURA": 6,
+                    "LANG": 42,
+                    "Inscrits": 1150,
+                    "Votants": 645
+                }
+            ];
+            
+            processData(defaultData);
+            document.getElementById('file-info').innerHTML = 
+                '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
+        }, 1000);
+    </script>
+</body>
+</html>
