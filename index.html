@@ -93,15 +93,17 @@
         .candidate-list {
             max-height: 200px;
             overflow-y: auto;
+            margin: 10px 0;
         }
         
         .candidate-item {
-            padding: 8px;
-            margin: 4px 0;
+            padding: 10px;
+            margin: 5px 0;
             background: white;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.2s;
+            border: 1px solid #e0e0e0;
         }
         
         .candidate-item:hover {
@@ -112,36 +114,51 @@
         .candidate-item.selected {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border: none;
         }
         
         .legend {
             background: white;
-            padding: 10px;
+            padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 15px 0;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 5px 0;
+            margin: 8px 0;
         }
         
         .color-box {
-            width: 20px;
-            height: 20px;
+            width: 25px;
+            height: 25px;
             margin-right: 10px;
             border-radius: 3px;
         }
         
         .radio-group {
-            margin: 10px 0;
+            margin: 15px 0;
         }
         
         .radio-group label {
-            display: block;
-            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
             cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        
+        .radio-group label:hover {
+            background: #f0f0f0;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 10px;
+            width: auto;
         }
         
         .loading {
@@ -162,6 +179,8 @@
             font-size: 0.9em;
             color: #666;
             margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
         }
         
         .error {
@@ -179,6 +198,21 @@
             background: #d4edda;
             margin: 10px 0;
         }
+        
+        #stats {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        #stats h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        #stats p {
+            margin: 5px 0;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -188,14 +222,15 @@
     
     <div id="main-container">
         <div id="sidebar">
-            <div class="control-group">
+            <div class="control-group" style="display: none;">
                 <h3><i class="fas fa-upload"></i> Chargement des données</h3>
-                <input type="file" id="file-input" accept=".json, .csv">
+                <input type="file" id="file-input" accept=".json,.csv" style="width: 100%; padding: 10px;">
                 <div id="file-info"></div>
             </div>
             
             <div class="control-group" id="candidates-panel" style="display: none;">
                 <h3><i class="fas fa-users"></i> Sélectionner un candidat</h3>
+                
                 <div class="radio-group">
                     <label>
                         <input type="radio" name="display-mode" value="candidates" checked> 
@@ -205,424 +240,2691 @@
                         <input type="radio" name="display-mode" value="participation"> 
                         <i class="fas fa-percent"></i> Taux de participation
                     </label>
-                    <label>
-                        <input type="radio" name="display-mode" value="comparison"> 
-                        <i class="fas fa-balance-scale"></i> Comparaison
-                    </label>
                 </div>
                 
                 <div id="candidate-list" class="candidate-list"></div>
                 
-                <div class="stats-card" id="stats"></div>
+                <div class="stats-card" id="stats">
+                    <h4>Statistiques</h4>
+                    <p>Sélectionnez un candidat</p>
+                </div>
                 
                 <div class="legend">
-                    <h4>Légende</h4>
+                    <h4>Légende - Intensité des voix</h4>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: #0000ff;"></div>
+                        <span>Faible</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: #00ffff;"></div>
+                        <span>Moyen-faible</span>
+                    </div>
                     <div class="legend-item">
                         <div class="color-box" style="background: #00ff00;"></div>
-                        <span>Faible intensité</span>
+                        <span>Moyen</span>
                     </div>
                     <div class="legend-item">
                         <div class="color-box" style="background: #ffff00;"></div>
-                        <span>Moyenne intensité</span>
+                        <span>Moyen-fort</span>
                     </div>
                     <div class="legend-item">
                         <div class="color-box" style="background: #ff0000;"></div>
-                        <span>Haute intensité</span>
+                        <span>Fort</span>
                     </div>
                 </div>
                 
                 <button id="refresh-map"><i class="fas fa-sync-alt"></i> Actualiser la carte</button>
-                <button id="reset-view"><i class="fas fa-globe"></i> Réinitialiser la vue</button>
             </div>
         </div>
         
         <div id="map"></div>
     </div>
-    
     <script>
-        // Configuration initiale
-        let map;
-        let currentHeatLayer = null;
-        let markers = [];
-        let currentData = null;
-        let candidatesList = [];
-        let currentCandidate = null;
+    // Variables globales
+    let map;
+    let heatLayer = null;
+    let markers = [];
+    let currentData = null;
+    let candidatesList = [];
+    let currentCandidate = null;
+    let currentMode = 'candidates';
+
+    // Palette de couleurs pour les candidats (maximum de contraste)
+    const candidateColors = [
+        '#FF0000', // Rouge vif
+        '#0000FF', // Bleu vif
+        '#00FF00', // Vert vif
+        '#FF00FF', // Magenta
+        '#FFA500', // Orange
+        '#800080', // Violet
+        '#008080', // Teal
+        '#FF1493', // Rose profond
+        '#32CD32', // Vert lime
+        '#FF4500', // Orange rouge
+        '#1E90FF', // Bleu dodger
+        '#DC143C', // Crimson
+        '#9400D3', // Violet foncé
+        '#2E8B57', // Vert océan
+        '#B8860B', // Ocre
+        '#4B0082', // Indigo
+        '#FF8C00', // Orange foncé
+        '#8B0000', // Rouge foncé
+        '#006400', // Vert foncé
+        '#8B008B'  // Magenta foncé
+    ];
+
+    // Fonction pour obtenir une couleur pour un candidat
+    function getCandidateColor(candidate, index) {
+        return candidateColors[index % candidateColors.length];
+    }
+
+    // Initialiser la carte
+    function initMap() {
+        map = L.map('map').setView([46.2276, 2.2137], 6);
         
-        // Initialiser la carte
-        function initMap() {
-            map = L.map('map').setView([48.8566, 2.3522], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 13,
+            minZoom:13
+        }).addTo(map);
+    }
+
+    // Fonction pour nettoyer la carte
+    function clearMap() {
+        if (heatLayer) {
+            map.removeLayer(heatLayer);
+            heatLayer = null;
+        }
+        
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+    }
+
+    // Traiter les données JSON
+    function processJSON(data) {
+        let processed = [];
+        
+        if (Array.isArray(data)) {
+            processed = data;
+        } else if (data.results && Array.isArray(data.results)) {
+            processed = data.results;
+        } else if (data.features && Array.isArray(data.features)) {
+            processed = data.features;
+        } else {
+            processed = [data];
+        }
+        
+        return processed;
+    }
+
+    // Traiter les données CSV
+    function processCSV(text) {
+        const lines = text.split('\n').filter(line => line.trim());
+        if (lines.length < 2) return [];
+        
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const data = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+            if (values.length !== headers.length) continue;
             
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-        }
-        
-        // Charger les données depuis un fichier JSON
-        function loadJSON(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    processData(data);
-                } catch (error) {
-                    showError('Erreur de parsing JSON : ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-        
-        // Charger les données depuis un fichier CSV
-        function loadCSV(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const lines = e.target.result.split('\n');
-                    const headers = lines[0].split(',').map(h => h.trim());
-                    
-                    const data = [];
-                    for (let i = 1; i < lines.length; i++) {
-                        if (!lines[i].trim()) continue;
-                        
-                        const values = lines[i].split(',').map(v => v.trim());
-                        const row = {};
-                        
-                        headers.forEach((header, index) => {
-                            if (header === 'Geo') {
-                                try {
-                                    row[header] = JSON.parse(values[index]);
-                                } catch {
-                                    row[header] = values[index];
-                                }
-                            } else {
-                                row[header] = isNaN(values[index]) ? values[index] : Number(values[index]);
-                            }
-                        });
-                        
-                        data.push(row);
+            const row = {};
+            headers.forEach((header, index) => {
+                let value = values[index];
+                
+                if (value && !isNaN(value) && value !== '') {
+                    row[header] = parseFloat(value);
+                } 
+                else if (header === 'Geo' && value) {
+                    try {
+                        row[header] = JSON.parse(value);
+                    } catch {
+                        row[header] = value;
                     }
-                    
-                    processData(data);
-                } catch (error) {
-                    showError('Erreur de parsing CSV : ' + error.message);
                 }
-            };
-            reader.readAsText(file);
+                else {
+                    row[header] = value;
+                }
+            });
+            data.push(row);
         }
         
-        // Traiter les données chargées
-        function processData(data) {
-            // Identifier les candidats (champs numériques)
-            const firstItem = Array.isArray(data) ? data[0] : data.results?.[0] || data;
-            
-            candidatesList = Object.keys(firstItem)
-                .filter(key => {
-                    if (key.toLowerCase().includes('nom') || 
-                        key.toLowerCase().includes('name') ||
-                        key.toLowerCase().includes('bureau')) return false;
-                    
-                    const value = firstItem[key];
-                    return typeof value === 'number' && 
-                           !['inscrits', 'votants', 'nuls', 'blancs', 'exprimes', 'latitude', 'longitude']
-                               .includes(key.toLowerCase());
+        return data;
+    }
+
+    // Extraire les coordonnées d'un bureau
+    function getCoordinates(bureau) {
+        if (bureau.coordonnees && Array.isArray(bureau.coordonnees)) {
+            return bureau.coordonnees;
+        }
+        if (bureau.Geo && Array.isArray(bureau.Geo)) {
+            return bureau.Geo;
+        }
+        if (bureau.latitude && bureau.longitude) {
+            return [parseFloat(bureau.latitude), parseFloat(bureau.longitude)];
+        }
+        if (bureau.lat && bureau.lon) {
+            return [parseFloat(bureau.lat), parseFloat(bureau.lon)];
+        }
+        if (bureau.geometry && bureau.geometry.coordinates) {
+            return [bureau.geometry.coordinates[1], bureau.geometry.coordinates[0]];
+        }
+        return null;
+    }
+
+    // Extraire la valeur pour un candidat
+    function getCandidateValue(bureau, candidate) {
+        if (bureau.resultats_candidats && bureau.resultats_candidats[candidate] !== undefined) {
+            return bureau.resultats_candidats[candidate];
+        }
+        if (bureau.results && bureau.results[candidate] !== undefined) {
+            return bureau.results[candidate];
+        }
+        if (bureau[candidate] !== undefined) {
+            return bureau[candidate];
+        }
+        if (bureau.statistiques && bureau.statistiques[candidate] !== undefined) {
+            return bureau.statistiques[candidate];
+        }
+        return 0;
+    }
+
+    // Trouver le candidat majoritaire dans un bureau
+    function getMajorityCandidate(bureau) {
+        let maxVoix = -1;
+        let majoritaire = null;
+        
+        candidatesList.forEach(candidate => {
+            const voix = getCandidateValue(bureau, candidate);
+            if (voix > maxVoix) {
+                maxVoix = voix;
+                majoritaire = candidate;
+            }
+        });
+        
+        return { candidate: majoritaire, voix: maxVoix };
+    }
+
+    // Détecter les candidats dans les données
+    function detectCandidates(data) {
+        if (!data || data.length === 0) return [];
+        
+        const firstItem = data[0];
+        const excludeFields = [
+            'bureau', 'Bureau', 'name', 'Name', 'nom', 'Nom',
+            'Geo', 'geo', 'coordonnees', 'coordinates', 'lat', 'lon',
+            'latitude', 'longitude', 'address', 'adresse',
+            'inscrits', 'Inscrits', 'votants', 'Votants',
+            'nuls', 'Nuls', 'blancs', 'Blancs', 'exprimes', 'Exprimé',
+            'id', 'ID', 'description', 'type', 'status'
+        ];
+        
+        const candidates = [];
+        
+        for (const [key, value] of Object.entries(firstItem)) {
+            if (typeof value === 'number' && !excludeFields.includes(key)) {
+                candidates.push(key);
+            }
+        }
+        
+        if (candidates.length === 0) {
+            if (firstItem.resultats_candidats) {
+                Object.keys(firstItem.resultats_candidats).forEach(key => {
+                    if (typeof firstItem.resultats_candidats[key] === 'number') {
+                        candidates.push(key);
+                    }
                 });
-            
-            if (candidatesList.length === 0) {
-                // Chercher dans un sous-objet
-                const resultsObj = firstItem.resultats_candidats || firstItem.results || firstItem.statistiques;
-                if (resultsObj) {
-                    candidatesList = Object.keys(resultsObj)
-                        .filter(key => typeof resultsObj[key] === 'number');
-                }
             }
-            
-            currentData = data;
-            
-            document.getElementById('candidates-panel').style.display = 'block';
-            document.getElementById('file-info').innerHTML = 
-                `<span class="success"><i class="fas fa-check"></i> ${data.length} bureaux chargés, ${candidatesList.length} candidats trouvés</span>`;
-            
-            updateCandidateList();
-            updateMap('candidates', candidatesList[0]);
-        }
-        
-        // Mettre à jour la liste des candidats
-        function updateCandidateList() {
-            const container = document.getElementById('candidate-list');
-            container.innerHTML = '';
-            
-            candidatesList.forEach(candidate => {
-                const div = document.createElement('div');
-                div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
-                div.textContent = candidate;
-                div.onclick = () => {
-                    document.querySelectorAll('.candidate-item').forEach(el => 
-                        el.classList.remove('selected'));
-                    div.classList.add('selected');
-                    currentCandidate = candidate;
-                    updateStats(candidate);
-                    
-                    const mode = document.querySelector('input[name="display-mode"]:checked').value;
-                    updateMap(mode, candidate);
-                };
-                container.appendChild(div);
-            });
-            
-            if (candidatesList.length > 0 && !currentCandidate) {
-                currentCandidate = candidatesList[0];
-                document.querySelector('.candidate-item')?.classList.add('selected');
-            }
-        }
-        
-        // Mettre à jour les statistiques
-        function updateStats(candidate) {
-            if (!currentData || !candidate) return;
-            
-            let totalVoix = 0;
-            let maxVoix = 0;
-            let maxBureau = '';
-            
-            currentData.forEach(bureau => {
-                let voix = 0;
-                
-                if (bureau.resultats_candidats && bureau.resultats_candidats[candidate]) {
-                    voix = bureau.resultats_candidats[candidate];
-                } else if (bureau.results && bureau.results[candidate]) {
-                    voix = bureau.results[candidate];
-                } else if (bureau[candidate]) {
-                    voix = bureau[candidate];
-                } else if (bureau.statistiques && bureau.statistiques[candidate]) {
-                    voix = bureau.statistiques[candidate];
-                }
-                
-                totalVoix += voix;
-                if (voix > maxVoix) {
-                    maxVoix = voix;
-                    maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
-                }
-            });
-            
-            document.getElementById('stats').innerHTML = `
-                <h4>Statistiques - ${candidate}</h4>
-                <p><strong>Total voix:</strong> ${totalVoix}</p>
-                <p><strong>Moyenne par bureau:</strong> ${Math.round(totalVoix / currentData.length)}</p>
-                <p><strong>Meilleur bureau:</strong> ${maxBureau} (${maxVoix} voix)</p>
-            `;
-        }
-        
-        // Mettre à jour la carte
-        function updateMap(mode, candidate) {
-            if (currentHeatLayer) {
-                map.removeLayer(currentHeatLayer);
-            }
-            
-            // Nettoyer les anciens markers
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            
-            const heatData = [];
-            
-            currentData.forEach(bureau => {
-                // Récupérer les coordonnées
-                let coords = null;
-                
-                if (bureau.coordonnees) {
-                    coords = bureau.coordonnees;
-                } else if (bureau.Geo) {
-                    coords = bureau.Geo;
-                } else if (bureau.latitude && bureau.longitude) {
-                    coords = [bureau.latitude, bureau.longitude];
-                }
-                
-                if (coords && coords.length >= 2) {
-                    // Récupérer la valeur selon le mode
-                    let value = 0;
-                    
-                    if (mode === 'candidates' && candidate) {
-                        if (bureau.resultats_candidats && bureau.resultats_candidats[candidate]) {
-                            value = bureau.resultats_candidats[candidate];
-                        } else if (bureau.results && bureau.results[candidate]) {
-                            value = bureau.results[candidate];
-                        } else if (bureau[candidate]) {
-                            value = bureau[candidate];
-                        } else if (bureau.statistiques && bureau.statistiques[candidate]) {
-                            value = bureau.statistiques[candidate];
-                        }
-                    } else if (mode === 'participation') {
-                        const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits;
-                        const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants;
-                        if (inscrits && votants) {
-                            value = (votants / inscrits) * 100;
-                        }
-                    } else if (mode === 'comparison' && candidatesList.length >= 2) {
-                        // Ratio entre deux premiers candidats
-                        const cand1 = bureau[candidatesList[0]] || 0;
-                        const cand2 = bureau[candidatesList[1]] || 1;
-                        value = cand1 / (cand2 || 1);
+            if (firstItem.results) {
+                Object.keys(firstItem.results).forEach(key => {
+                    if (typeof firstItem.results[key] === 'number') {
+                        candidates.push(key);
                     }
+                });
+            }
+        }
+        
+        return candidates;
+    }
+
+    // Mettre à jour la carte
+    function updateMap() {
+        clearMap();
+        
+        if (!currentData || currentData.length === 0) return;
+        
+        const heatPoints = [];
+        const bounds = [];
+        
+        if (currentMode === 'majority') {
+            // Mode majorité : chaque bureau a la couleur de son candidat majoritaire
+            currentData.forEach((bureau, index) => {
+                const coords = getCoordinates(bureau);
+                if (!coords) return;
+                
+                bounds.push(coords);
+                
+                const { candidate, voix } = getMajorityCandidate(bureau);
+                if (candidate) {
+                    const candidateIndex = candidatesList.indexOf(candidate);
+                    const color = getCandidateColor(candidate, candidateIndex);
                     
-                    if (value > 0) {
-                        heatData.push([coords[0], coords[1], value]);
-                    }
+                    // Calculer l'intensité basée sur le pourcentage
+                    const total = candidatesList.reduce((sum, c) => sum + getCandidateValue(bureau, c), 0);
+                    const pourcentage = total > 0 ? (voix / total) * 100 : 0;
                     
-                    // Ajouter un marker avec popup
+                    // Taille du marqueur basée sur le pourcentage (plus le candidat est dominant, plus le cercle est gros)
+                    const radius = 8 + (pourcentage / 10);
+                    
                     const marker = L.circleMarker([coords[0], coords[1]], {
-                        radius: 5,
-                        color: 'blue',
-                        fillOpacity: 0.5
+                        radius: radius,
+                        color: '#000',
+                        weight: 2,
+                        fillColor: color,
+                        fillOpacity: 0.9
                     }).bindPopup(`
                         <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
                         ${bureau.address || bureau.Adresse || ''}<br>
-                        <b>Voix ${candidate || ''}:</b> ${value}<br>
-                        <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
+                        <b>Candidat majoritaire:</b> ${candidate}<br>
+                        <b>Voix:</b> ${voix}<br>
+                        <b>Pourcentage:</b> ${pourcentage.toFixed(1)}%<br>
+                        <hr>
+                        ${candidatesList.map(c => {
+                            const v = getCandidateValue(bureau, c);
+                            return `<b>${c}:</b> ${v} (${total > 0 ? ((v/total)*100).toFixed(1) : 0}%)<br>`;
+                        }).join('')}
                     `);
                     
                     marker.addTo(map);
                     markers.push(marker);
                 }
             });
+        } else {
+            // Mode normal (heatmap)
+            currentData.forEach(bureau => {
+                const coords = getCoordinates(bureau);
+                if (!coords) return;
+                
+                bounds.push(coords);
+                
+                let value = 0;
+                
+                if (currentMode === 'candidates' && currentCandidate) {
+                    value = getCandidateValue(bureau, currentCandidate);
+                } else if (currentMode === 'participation') {
+                    const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits || 0;
+                    const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants || 0;
+                    if (inscrits > 0) {
+                        value = (votants / inscrits) * 100;
+                    }
+                }
+                
+                if (value > 0) {
+                    heatPoints.push([coords[0], coords[1], value]);
+                }
+                
+                // Marqueur standard avec popup
+                const marker = L.circleMarker([coords[0], coords[1]], {
+                    radius: 3,
+                    color: '#333',
+                    weight: 1,
+                    fillColor: '#667eea',
+                    fillOpacity: 0.1
+                }).bindPopup(`
+                    <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
+                    ${bureau.address || bureau.Adresse || ''}<br>
+                    <b>${currentCandidate || 'Votes'}:</b> ${value}<br>
+                    <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
+                `);
+                
+                marker.addTo(map);
+                markers.push(marker);
+            });
             
-            // Ajouter la couche de chaleur
-            if (heatData.length > 0) {
-                const maxValue = Math.max(...heatData.map(d => d[2]));
-                const normalizedData = heatData.map(d => [
-                    d[0], 
-                    d[1], 
-                    d[2] / maxValue // Normalisation
+            // Ajouter la couche de chaleur avec meilleur contraste
+            if (heatPoints.length > 0) {
+                const maxValue = Math.max(...heatPoints.map(p => p[2]));
+                const normalizedPoints = heatPoints.map(p => [
+                    p[0],
+                    p[1],
+                    p[2] / maxValue
                 ]);
                 
-                currentHeatLayer = L.heatLayer(normalizedData, {
-                    radius: 25,
-                    blur: 15,
-                    maxZoom: 17,
+                heatLayer = L.heatLayer(normalizedPoints, {
+                    radius: 50,
+                    // blur: 100,
+                    maxZoom: 15,
                     gradient: {
-                        0.2: 'blue',
-                        0.4: 'cyan',
-                        0.6: 'lime',
-                        0.8: 'yellow',
-                        1.0: 'red'
+                        0.0: '#0000FF',     // Bleu foncé
+                        0.1: '#0066FF',      // Bleu moyen
+                        0.2: '#00CCFF',      // Bleu clair
+                        0.3: '#00FFCC',      // Turquoise
+                        0.4: '#00FF66',      // Vert
+                        0.5: '#66FF00',      // Vert clair
+                        0.6: '#CCFF00',      // Jaune-vert
+                        0.7: '#FFFF00',      // Jaune
+                        0.8: '#FFCC00',      // Orange-jaune
+                        0.9: '#FF6600',      // Orange
+                        1.0: '#FF0000'       // Rouge vif
                     }
                 }).addTo(map);
             }
-            
-            // Centrer la carte sur les données
-            if (heatData.length > 0) {
-                const centerLat = heatData.reduce((sum, d) => sum + d[0], 0) / heatData.length;
-                const centerLng = heatData.reduce((sum, d) => sum + d[1], 0) / heatData.length;
-                map.setView([centerLat, centerLng], 13);
-            }
         }
         
-        // Afficher une erreur
-        function showError(message) {
-            document.getElementById('file-info').innerHTML = 
-                `<span class="error"><i class="fas fa-exclamation-triangle"></i> ${message}</span>`;
+        // Ajouter une légende pour le mode majorité
+        if (currentMode === 'majority') {
+            const legend = L.control({ position: 'bottomright' });
+            
+            legend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'info legend');
+                div.style.backgroundColor = 'white';
+                div.style.padding = '10px';
+                div.style.borderRadius = '5px';
+                div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                
+                div.innerHTML = '<h4 style="margin-bottom: 10px;">Candidats majoritaires</h4>';
+                
+                candidatesList.forEach((candidate, index) => {
+                    const color = getCandidateColor(candidate, index);
+                    div.innerHTML += `
+                        <div style="display: flex; align-items: center; margin: 5px 0;">
+                            <div style="width: 20px; height: 20px; background: ${color}; margin-right: 10px; border: 1px solid #000;"></div>
+                            <span>${candidate}</span>
+                        </div>
+                    `;
+                });
+                
+                div.innerHTML += '<hr><p style="font-size: 0.8em; margin-top: 5px;">La taille des cercles indique le % de voix</p>';
+                
+                return div;
+            };
+            
+            legend.addTo(map);
         }
         
-        // Gestionnaire d'upload de fichier
-        document.getElementById('file-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Ajuster la vue
+        if (bounds.length > 0) {
+            const lats = bounds.map(b => b[0]);
+            const lngs = bounds.map(b => b[1]);
+            const southWest = [Math.min(...lats), Math.min(...lngs)];
+            const northEast = [Math.max(...lats), Math.max(...lngs)];
+            map.fitBounds([southWest, northEast], { padding: [50, 50] });
+        }
+        
+        updateStats();
+    }
+
+    // Mettre à jour les statistiques
+    function updateStats() {
+        if (!currentData || !currentCandidate) return;
+        
+        let total = 0;
+        let max = 0;
+        let maxBureau = '';
+        
+        currentData.forEach(bureau => {
+            const value = getCandidateValue(bureau, currentCandidate);
+            total += value;
             
-            if (file.name.endsWith('.json')) {
-                loadJSON(file);
-            } else if (file.name.endsWith('.csv')) {
-                loadCSV(file);
-            } else {
-                showError('Format non supporté. Utilisez JSON ou CSV.');
+            if (value > max) {
+                max = value;
+                maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
             }
         });
         
-        // Gestionnaire des modes d'affichage
-        document.querySelectorAll('input[name="display-mode"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const mode = this.value;
-                if (mode === 'candidates') {
-                    document.getElementById('candidate-list').style.display = 'block';
-                    updateMap(mode, currentCandidate);
+        const statsDiv = document.getElementById('stats');
+        statsDiv.innerHTML = `
+            <h4>Statistiques - ${currentCandidate}</h4>
+            <p><strong>Total voix:</strong> ${total}</p>
+            <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
+            <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
+            <p><strong>Bureaux:</strong> ${currentData.length}</p>
+        `;
+    }
+
+    // Mettre à jour la liste des candidats
+    function updateCandidatesList() {
+        const container = document.getElementById('candidate-list');
+        container.innerHTML = '';
+        
+        candidatesList.forEach(candidate => {
+            const div = document.createElement('div');
+            div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
+            div.textContent = candidate;
+            div.onclick = () => {
+                document.querySelectorAll('.candidate-item').forEach(el => 
+                    el.classList.remove('selected'));
+                div.classList.add('selected');
+                currentCandidate = candidate;
+                updateMap();
+            };
+            container.appendChild(div);
+        });
+    }
+
+    // Gestionnaire d'upload
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                let data;
+                
+                if (file.name.endsWith('.json')) {
+                    const jsonData = JSON.parse(e.target.result);
+                    data = processJSON(jsonData);
+                } else if (file.name.endsWith('.csv')) {
+                    data = processCSV(e.target.result);
                 } else {
-                    document.getElementById('candidate-list').style.display = 'none';
-                    updateMap(mode);
-                }
-            });
-        });
-        
-        // Bouton actualiser
-        document.getElementById('refresh-map').addEventListener('click', function() {
-            const mode = document.querySelector('input[name="display-mode"]:checked').value;
-            updateMap(mode, currentCandidate);
-        });
-        
-        // Bouton réinitialiser la vue
-        document.getElementById('reset-view').addEventListener('click', function() {
-            if (currentData && currentData.length > 0) {
-                const firstBureau = currentData[0];
-                let coords = null;
-                
-                if (firstBureau.coordonnees) {
-                    coords = firstBureau.coordonnees;
-                } else if (firstBureau.Geo) {
-                    coords = firstBureau.Geo;
-                } else if (firstBureau.latitude && firstBureau.longitude) {
-                    coords = [firstBureau.latitude, firstBureau.longitude];
+                    throw new Error('Format non supporté');
                 }
                 
-                if (coords) {
-                    map.setView([coords[0], coords[1]], 13);
+                if (data.length === 0) {
+                    throw new Error('Aucune donnée trouvée');
                 }
+                
+                currentData = data;
+                candidatesList = detectCandidates(data);
+                
+                if (candidatesList.length > 0) {
+                    currentCandidate = candidatesList[0];
+                }
+                
+                document.getElementById('candidates-panel').style.display = 'block';
+                document.getElementById('file-info').innerHTML = 
+                    `<span class="success"><i class="fas fa-check"></i> ${data.length} bureaux chargés, ${candidatesList.length} candidats trouvés</span>`;
+                
+                updateCandidatesList();
+                updateMap();
+                
+            } catch (error) {
+                document.getElementById('file-info').innerHTML = 
+                    `<span class="error"><i class="fas fa-exclamation-triangle"></i> Erreur: ${error.message}</span>`;
+            }
+        };
+        
+        if (file.name.endsWith('.json') || file.name.endsWith('.csv')) {
+            reader.readAsText(file);
+        }
+    });
+
+    // Gestionnaire des modes
+    document.querySelectorAll('input[name="display-mode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            currentMode = this.value;
+            
+            if (currentMode === 'candidates') {
+                document.getElementById('candidate-list').style.display = 'block';
+                if (currentCandidate) {
+                    updateMap();
+                }
+            } else if (currentMode === 'majority') {
+                document.getElementById('candidate-list').style.display = 'none';
+                updateMap();
+            } else {
+                document.getElementById('candidate-list').style.display = 'none';
+                updateMap();
             }
         });
+    });
+
+    // Bouton actualiser
+    document.getElementById('refresh-map').addEventListener('click', function() {
+        if (currentData) {
+            updateMap();
+        }
+    });
+
+    // Initialiser la carte au chargement
+    initMap();
+
+    // Données d'exemple
+    setTimeout(() => {
+        const voteData = [
+            {
+    "bureau": "101",
+    "coordonnees": [
+      49.2584032,
+      4.0322568
+    ],
+    "nom": "Bureau 101 - Le Cellier",
+    "inscrits": 1120,
+    "votants": 682,
+    "nuls": 6,
+    "blancs": 7,
+    "exprimé": 669,
+    "rose": 5,
+    "coradel": 28,
+    "frigout": 54,
+    "quenard": 103,
+    "robinet": 425,
+    "mura": 4,
+    "lang": 50
+  },
+  {
+    "bureau": "102",
+    "coordonnees": [
+      49.2584032,
+      4.0322568
+    ],
+    "nom": "Bureau 102 - Le Cellier",
+    "inscrits": 1048,
+    "votants": 587,
+    "nuls": 1,
+    "blancs": 4,
+    "exprimé": 582,
+    "rose": 2,
+    "coradel": 15,
+    "frigout": 54,
+    "quenard": 97,
+    "robinet": 360,
+    "mura": 1,
+    "lang": 53
+  },
+  {
+    "bureau": "103",
+    "coordonnees": [
+      49.262635,
+      4.043785
+    ],
+    "nom": "Bureau 103 - Ecole Maternelle Jamin",
+    "inscrits": 989,
+    "votants": 527,
+    "nuls": 1,
+    "blancs": 2,
+    "exprimé": 524,
+    "rose": 2,
+    "coradel": 31,
+    "frigout": 59,
+    "quenard": 83,
+    "robinet": 304,
+    "mura": 2,
+    "lang": 43
+  },
+  {
+    "bureau": "104",
+    "coordonnees": [
+      49.2528002,
+      4.0291176
+    ],
+    "nom": "Bureau 104 - Salle d’Exposition",
+    "inscrits": 956,
+    "votants": 519,
+    "nuls": 4,
+    "blancs": 6,
+    "exprimé": 509,
+    "rose": 13,
+    "coradel": 34,
+    "frigout": 59,
+    "quenard": 86,
+    "robinet": 280,
+    "mura": 2,
+    "lang": 35
+  },
+  {
+    "bureau": "105",
+    "coordonnees": [
+      49.2499403,
+      4.0343544
+    ],
+    "nom": "Bureau 105 - Ecole Maternelle Jard",
+    "inscrits": 974,
+    "votants": 475,
+    "nuls": 3,
+    "blancs": 5,
+    "exprimé": 467,
+    "rose": 4,
+    "coradel": 21,
+    "frigout": 87,
+    "quenard": 104,
+    "robinet": 204,
+    "mura": 2,
+    "lang": 45
+  },
+  {
+    "bureau": "106",
+    "coordonnees": [
+      49.2499403,
+      4.0343544
+    ],
+    "nom": "Bureau 106 - Ecole Maternelle Jard",
+    "inscrits": 1119,
+    "votants": 596,
+    "nuls": 0,
+    "blancs": 11,
+    "exprimé": 585,
+    "rose": 4,
+    "coradel": 42,
+    "frigout": 66,
+    "quenard": 131,
+    "robinet": 279,
+    "mura": 3,
+    "lang": 60
+  },
+  {
+    "bureau": "107",
+    "coordonnees": [
+      49.2500619,
+      4.0356949
+    ],
+    "nom": "Bureau 107 - Conservatoire à Rayonnement Régional",
+    "inscrits": 975,
+    "votants": 535,
+    "nuls": 4,
+    "blancs": 5,
+    "exprimé": 526,
+    "rose": 4,
+    "coradel": 35,
+    "frigout": 98,
+    "quenard": 122,
+    "robinet": 209,
+    "mura": 5,
+    "lang": 53
+  },
+  {
+    "bureau": "108",
+    "coordonnees": [
+      49.2500619,
+      4.0356949
+    ],
+    "nom": "Bureau 108 - Conservatoire à Rayonnement Régional",
+    "inscrits": 850,
+    "votants": 508,
+    "nuls": 4,
+    "blancs": 2,
+    "exprimé": 502,
+    "rose": 4,
+    "coradel": 30,
+    "frigout": 56,
+    "quenard": 117,
+    "robinet": 223,
+    "mura": 5,
+    "lang": 67
+  },
+  {
+    "bureau": "109",
+    "coordonnees": [
+      49.2514951,
+      4.038408899999999
+    ],
+    "nom": "Bureau 109 - Ecole Elémentaire Université",
+    "inscrits": 849,
+    "votants": 486,
+    "nuls": 2,
+    "blancs": 3,
+    "exprimé": 481,
+    "rose": 5,
+    "coradel": 18,
+    "frigout": 57,
+    "quenard": 82,
+    "robinet": 261,
+    "mura": 1,
+    "lang": 57
+  },
+  {
+    "bureau": "110",
+    "coordonnees": [
+      49.2541305,
+      4.0373635
+    ],
+    "nom": "Bureau 110 - Ecole Maternelle Voltaire",
+    "inscrits": 1106,
+    "votants": 656,
+    "nuls": 2,
+    "blancs": 7,
+    "exprimé": 647,
+    "rose": 4,
+    "coradel": 24,
+    "frigout": 61,
+    "quenard": 100,
+    "robinet": 403,
+    "mura": 0,
+    "lang": 55
+  },
+  {
+    "bureau": "111",
+    "coordonnees": [
+      49.2539188,
+      4.0377481
+    ],
+    "nom": "Bureau 111 - Ecole Elémentaire Voltaire",
+    "inscrits": 1216,
+    "votants": 708,
+    "nuls": 4,
+    "blancs": 10,
+    "exprimé": 694,
+    "rose": 5,
+    "coradel": 25,
+    "frigout": 92,
+    "quenard": 99,
+    "robinet": 416,
+    "mura": 1,
+    "lang": 56
+  },
+  {
+    "bureau": "112",
+    "coordonnees": [
+      49.2565163,
+      4.051881799999999
+    ],
+    "nom": "Bureau 112 - Gymnase Endi Miyen",
+    "inscrits": 1108,
+    "votants": 678,
+    "nuls": 10,
+    "blancs": 8,
+    "exprimé": 660,
+    "rose": 8,
+    "coradel": 34,
+    "frigout": 112,
+    "quenard": 126,
+    "robinet": 320,
+    "mura": 6,
+    "lang": 54
+  },
+  {
+    "bureau": "113",
+    "coordonnees": [
+      49.2565163,
+      4.051881799999999
+    ],
+    "nom": "Bureau 113 - Gymnase Barbusse",
+    "inscrits": 917,
+    "votants": 529,
+    "nuls": 5,
+    "blancs": 4,
+    "exprimé": 520,
+    "rose": 2,
+    "coradel": 19,
+    "frigout": 75,
+    "quenard": 112,
+    "robinet": 233,
+    "mura": 2,
+    "lang": 77
+  },
+  {
+    "bureau": "114",
+    "coordonnees": [
+      49.2488115,
+      4.051758599999999
+    ],
+    "nom": "Bureau 114 - Ecole Maternelle Pommery",
+    "inscrits": 980,
+    "votants": 573,
+    "nuls": 2,
+    "blancs": 7,
+    "exprimé": 564,
+    "rose": 5,
+    "coradel": 22,
+    "frigout": 83,
+    "quenard": 113,
+    "robinet": 274,
+    "mura": 4,
+    "lang": 63
+  },
+  {
+    "bureau": "115",
+    "coordonnees": [
+      49.2488115,
+      4.051758599999999
+    ],
+    "nom": "Bureau 115 - Ecole Maternelle Pommery",
+    "inscrits": 963,
+    "votants": 458,
+    "nuls": 5,
+    "blancs": 8,
+    "exprimé": 445,
+    "rose": 2,
+    "coradel": 27,
+    "frigout": 85,
+    "quenard": 81,
+    "robinet": 206,
+    "mura": 3,
+    "lang": 41
+  },
+  {
+    "bureau": "116",
+    "coordonnees": [
+      49.2488115,
+      4.051758599999999
+    ],
+    "nom": "Bureau 116 - Ecole Maternelle Pommery",
+    "inscrits": 1075,
+    "votants": 630,
+    "nuls": 5,
+    "blancs": 4,
+    "exprimé": 621,
+    "rose": 6,
+    "coradel": 18,
+    "frigout": 82,
+    "quenard": 96,
+    "robinet": 338,
+    "mura": 1,
+    "lang": 80
+  },
+  {
+    "bureau": "201",
+    "coordonnees": [
+      49.2429603,
+      4.025175
+    ],
+    "nom": "Bureau 201 - Complexe Sportif René Tys",
+    "inscrits": 583,
+    "votants": 335,
+    "nuls": 3,
+    "blancs": 2,
+    "exprimé": 330,
+    "rose": 5,
+    "coradel": 25,
+    "frigout": 53,
+    "quenard": 64,
+    "robinet": 142,
+    "mura": 0,
+    "lang": 41
+  },
+  {
+    "bureau": "202",
+    "coordonnees": [
+      49.2383312,
+      4.0202696
+    ],
+    "nom": "Bureau 202 - Ecole Elémentaire Ravel",
+    "inscrits": 1280,
+    "votants": 351,
+    "nuls": 4,
+    "blancs": 3,
+    "exprimé": 344,
+    "rose": 10,
+    "coradel": 85,
+    "frigout": 43,
+    "quenard": 60,
+    "robinet": 106,
+    "mura": 23,
+    "lang": 17
+  },
+  {
+    "bureau": "203",
+    "coordonnees": [
+      49.2326787,
+      4.0261531
+    ],
+    "nom": "Bureau 203 - Ecole Maternelle Docteur Roux",
+    "inscrits": 1065,
+    "votants": 335,
+    "nuls": 3,
+    "blancs": 2,
+    "exprimé": 330,
+    "rose": 9,
+    "coradel": 50,
+    "frigout": 79,
+    "quenard": 57,
+    "robinet": 108,
+    "mura": 5,
+    "lang": 22
+  },
+  {
+    "bureau": "204",
+    "coordonnees": [
+      49.2326787,
+      4.0261531
+    ],
+    "nom": "Bureau 204 - Ecole Maternelle Docteur Roux",
+    "inscrits": 993,
+    "votants": 328,
+    "nuls": 4,
+    "blancs": 2,
+    "exprimé": 322,
+    "rose": 6,
+    "coradel": 42,
+    "frigout": 75,
+    "quenard": 50,
+    "robinet": 111,
+    "mura": 18,
+    "lang": 20
+  },
+  {
+    "bureau": "205",
+    "coordonnees": [
+      49.231831,
+      4.015381
+    ],
+    "nom": "Bureau 205 - Ecole Elémentaire Maison Blanche",
+    "inscrits": 1035,
+    "votants": 462,
+    "nuls": 3,
+    "blancs": 5,
+    "exprimé": 454,
+    "rose": 14,
+    "coradel": 29,
+    "frigout": 164,
+    "quenard": 80,
+    "robinet": 139,
+    "mura": 4,
+    "lang": 24
+  },
+  {
+    "bureau": "206",
+    "coordonnees": [
+      49.2243991,
+      4.0205209
+    ],
+    "nom": "Bureau 206 - Ecole Maternelle Jean D’Aulan",
+    "inscrits": 1050,
+    "votants": 403,
+    "nuls": 2,
+    "blancs": 4,
+    "exprimé": 397,
+    "rose": 13,
+    "coradel": 23,
+    "frigout": 165,
+    "quenard": 40,
+    "robinet": 131,
+    "mura": 9,
+    "lang": 16
+  },
+  {
+    "bureau": "207",
+    "coordonnees": [
+      49.2211233,
+      4.030653099999999
+    ],
+    "nom": "Bureau 207 - Ecole Elémentaire Turenne",
+    "inscrits": 1002,
+    "votants": 569,
+    "nuls": 3,
+    "blancs": 7,
+    "exprimé": 559,
+    "rose": 7,
+    "coradel": 24,
+    "frigout": 135,
+    "quenard": 104,
+    "robinet": 246,
+    "mura": 6,
+    "lang": 37
+  },
+  {
+    "bureau": "208",
+    "coordonnees": [
+      49.2145558,
+      4.0254683
+    ],
+    "nom": "Bureau 208 - Ecole Maternelle Mazarin",
+    "inscrits": 1080,
+    "votants": 498,
+    "nuls": 5,
+    "blancs": 4,
+    "exprimé": 489,
+    "rose": 7,
+    "coradel": 25,
+    "frigout": 111,
+    "quenard": 103,
+    "robinet": 213,
+    "mura": 5,
+    "lang": 25
+  },
+  {
+    "bureau": "209",
+    "coordonnees": [
+      49.2145558,
+      4.0254683
+    ],
+    "nom": "Bureau 209 - Ecole Maternelle Mazarin",
+    "inscrits": 968,
+    "votants": 521,
+    "nuls": 2,
+    "blancs": 3,
+    "exprimé": 516,
+    "rose": 10,
+    "coradel": 27,
+    "frigout": 133,
+    "quenard": 65,
+    "robinet": 241,
+    "mura": 5,
+    "lang": 35
+  },
+  {
+    "bureau": "210",
+    "coordonnees": [
+      49.2104624,
+      4.025082400000001
+    ],
+    "nom": "Bureau 210 - Ecole Elémentaire Sully",
+    "inscrits": 1010,
+    "votants": 421,
+    "nuls": 6,
+    "blancs": 0,
+    "exprimé": 415,
+    "rose": 6,
+    "coradel": 20,
+    "frigout": 119,
+    "quenard": 68,
+    "robinet": 169,
+    "mura": 3,
+    "lang": 30
+  },
+  {
+    "bureau": "211",
+    "coordonnees": [
+      49.2104624,
+      4.025082400000001
+    ],
+    "nom": "Bureau 211 - Ecole Elémentaire Sully",
+    "inscrits": 801,
+    "votants": 364,
+    "nuls": 4,
+    "blancs": 8,
+    "exprimé": 352,
+    "rose": 6,
+    "coradel": 24,
+    "frigout": 101,
+    "quenard": 41,
+    "robinet": 143,
+    "mura": 7,
+    "lang": 30
+  },
+  {
+    "bureau": "212",
+    "coordonnees": [
+      49.2104624,
+      4.025082400000001
+    ],
+    "nom": "Bureau 212 - Ecole Elémentaire Sully",
+    "inscrits": 816,
+    "votants": 404,
+    "nuls": 4,
+    "blancs": 1,
+    "exprimé": 399,
+    "rose": 6,
+    "coradel": 22,
+    "frigout": 77,
+    "quenard": 81,
+    "robinet": 187,
+    "mura": 8,
+    "lang": 18
+  },
+  {
+    "bureau": "301",
+    "coordonnees": [
+      49.2446029,
+      4.0088332
+    ],
+    "nom": "Bureau 301 - Ecole Maternelle Sculpteurs Jacques",
+    "inscrits": 1116,
+    "votants": 463,
+    "nuls": 1,
+    "blancs": 2,
+    "exprimé": 460,
+    "rose": 9,
+    "coradel": 39,
+    "frigout": 94,
+    "quenard": 82,
+    "robinet": 192,
+    "mura": 6,
+    "lang": 38
+  },
+  {
+    "bureau": "302",
+    "coordonnees": [
+      49.2446029,
+      4.0088332
+    ],
+    "nom": "Bureau 302 - Ecole Elémentaire Sculpteurs Jacques",
+    "inscrits": 894,
+    "votants": 484,
+    "nuls": 1,
+    "blancs": 3,
+    "exprimé": 480,
+    "rose": 6,
+    "coradel": 15,
+    "frigout": 88,
+    "quenard": 100,
+    "robinet": 206,
+    "mura": 1,
+    "lang": 64
+  },
+  {
+    "bureau": "303",
+    "coordonnees": [
+      49.2446029,
+      4.0088332
+    ],
+    "nom": "Bureau 303 - Ecole Elémentaire Sculpteurs Jacques",
+    "inscrits": 1048,
+    "votants": 582,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 578,
+    "rose": 10,
+    "coradel": 24,
+    "frigout": 100,
+    "quenard": 137,
+    "robinet": 249,
+    "mura": 1,
+    "lang": 57
+  },
+  {
+    "bureau": "304",
+    "coordonnees": [
+      49.2339037,
+      4.0060558
+    ],
+    "nom": "Bureau 304 - Ecole Elémentaire Hippodrome",
+    "inscrits": 629,
+    "votants": 138,
+    "nuls": 5,
+    "blancs": 3,
+    "exprimé": 130,
+    "rose": 1,
+    "coradel": 13,
+    "frigout": 35,
+    "quenard": 38,
+    "robinet": 30,
+    "mura": 3,
+    "lang": 10
+  },
+  {
+    "bureau": "305",
+    "coordonnees": [
+      49.2369263,
+      4.0074751
+    ],
+    "nom": "Bureau 305 - Ecole Elémentaire Docteur Billard",
+    "inscrits": 861,
+    "votants": 235,
+    "nuls": 4,
+    "blancs": 4,
+    "exprimé": 227,
+    "rose": 4,
+    "coradel": 25,
+    "frigout": 58,
+    "quenard": 53,
+    "robinet": 59,
+    "mura": 14,
+    "lang": 14
+  },
+  {
+    "bureau": "306",
+    "coordonnees": [
+      49.2393317,
+      4.0105081
+    ],
+    "nom": "Bureau 306 - Ecole Elémentaire Gilberte et Jean Droit",
+    "inscrits": 906,
+    "votants": 332,
+    "nuls": 3,
+    "blancs": 3,
+    "exprimé": 326,
+    "rose": 12,
+    "coradel": 31,
+    "frigout": 102,
+    "quenard": 43,
+    "robinet": 109,
+    "mura": 8,
+    "lang": 21
+  },
+  {
+    "bureau": "307",
+    "coordonnees": [
+      49.23679629999999,
+      4.0171622
+    ],
+    "nom": "Bureau 307 - Ecole Maternelle Avranches",
+    "inscrits": 788,
+    "votants": 294,
+    "nuls": 1,
+    "blancs": 0,
+    "exprimé": 293,
+    "rose": 10,
+    "coradel": 18,
+    "frigout": 93,
+    "quenard": 40,
+    "robinet": 108,
+    "mura": 5,
+    "lang": 19
+  },
+  {
+    "bureau": "308",
+    "coordonnees": [
+      49.231418,
+      4.007657
+    ],
+    "nom": "Bureau 308 - Ecole Elémentaire Provençaux",
+    "inscrits": 955,
+    "votants": 212,
+    "nuls": 1,
+    "blancs": 2,
+    "exprimé": 209,
+    "rose": 5,
+    "coradel": 16,
+    "frigout": 52,
+    "quenard": 53,
+    "robinet": 55,
+    "mura": 14,
+    "lang": 14
+  },
+  {
+    "bureau": "309",
+    "coordonnees": [
+      49.2299296,
+      4.0028631
+    ],
+    "nom": "Bureau 309 - Ecole Elémentaire Joliot Curie",
+    "inscrits": 1039,
+    "votants": 302,
+    "nuls": 1,
+    "blancs": 3,
+    "exprimé": 298,
+    "rose": 8,
+    "coradel": 40,
+    "frigout": 88,
+    "quenard": 57,
+    "robinet": 72,
+    "mura": 21,
+    "lang": 12
+  },
+  {
+    "bureau": "310",
+    "coordonnees": [
+      49.2260461,
+      4.0087429
+    ],
+    "nom": "Bureau 310 - Ecole Elémentaire Newton",
+    "inscrits": 871,
+    "votants": 305,
+    "nuls": 5,
+    "blancs": 2,
+    "exprimé": 298,
+    "rose": 5,
+    "coradel": 32,
+    "frigout": 71,
+    "quenard": 73,
+    "robinet": 86,
+    "mura": 10,
+    "lang": 21
+  },
+  {
+    "bureau": "311",
+    "coordonnees": [
+      49.2260461,
+      4.0087429
+    ],
+    "nom": "Bureau 311 - Ecole Elémentaire Newton",
+    "inscrits": 624,
+    "votants": 119,
+    "nuls": 2,
+    "blancs": 1,
+    "exprimé": 116,
+    "rose": 1,
+    "coradel": 20,
+    "frigout": 29,
+    "quenard": 17,
+    "robinet": 33,
+    "mura": 7,
+    "lang": 9
+  },
+  {
+    "bureau": "312",
+    "coordonnees": [
+      49.2251922,
+      4.0146404
+    ],
+    "nom": "Bureau 312 - Ecole Elémentaire Blanche Cavarrot",
+    "inscrits": 978,
+    "votants": 326,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 322,
+    "rose": 7,
+    "coradel": 25,
+    "frigout": 99,
+    "quenard": 46,
+    "robinet": 118,
+    "mura": 8,
+    "lang": 19
+  },
+  {
+    "bureau": "401",
+    "coordonnees": [
+      49.2577254,
+      4.0320429
+    ],
+    "nom": "Bureau 401 - Hôtel de Ville",
+    "inscrits": 990,
+    "votants": 530,
+    "nuls": 3,
+    "blancs": 6,
+    "exprimé": 521,
+    "rose": 2,
+    "coradel": 30,
+    "frigout": 53,
+    "quenard": 86,
+    "robinet": 307,
+    "mura": 1,
+    "lang": 42
+  },
+  {
+    "bureau": "402",
+    "coordonnees": [
+      49.2543748,
+      4.0257482
+    ],
+    "nom": "Bureau 402 - Ecole Maternelle Pouply",
+    "inscrits": 974,
+    "votants": 549,
+    "nuls": 3,
+    "blancs": 7,
+    "exprimé": 539,
+    "rose": 3,
+    "coradel": 25,
+    "frigout": 66,
+    "quenard": 72,
+    "robinet": 308,
+    "mura": 2,
+    "lang": 63
+  },
+  {
+    "bureau": "403",
+    "coordonnees": [
+      49.2540391,
+      4.0260675
+    ],
+    "nom": "Bureau 403 - Ecole Maternelle Pouply",
+    "inscrits": 1154,
+    "votants": 635,
+    "nuls": 2,
+    "blancs": 3,
+    "exprimé": 630,
+    "rose": 3,
+    "coradel": 37,
+    "frigout": 76,
+    "quenard": 121,
+    "robinet": 346,
+    "mura": 5,
+    "lang": 42
+  },
+  {
+    "bureau": "404",
+    "coordonnees": [
+      49.2466981,
+      4.0165435
+    ],
+    "nom": "Bureau 404 - Ecole Maternelle Martin Peller",
+    "inscrits": 889,
+    "votants": 416,
+    "nuls": 0,
+    "blancs": 2,
+    "exprimé": 414,
+    "rose": 9,
+    "coradel": 37,
+    "frigout": 93,
+    "quenard": 90,
+    "robinet": 140,
+    "mura": 5,
+    "lang": 40
+  },
+  {
+    "bureau": "405",
+    "coordonnees": [
+      49.2466981,
+      4.0165435
+    ],
+    "nom": "Bureau 405 - Ecole Maternelle Martin Peller",
+    "inscrits": 837,
+    "votants": 492,
+    "nuls": 0,
+    "blancs": 5,
+    "exprimé": 487,
+    "rose": 3,
+    "coradel": 32,
+    "frigout": 94,
+    "quenard": 107,
+    "robinet": 207,
+    "mura": 3,
+    "lang": 41
+  },
+  {
+    "bureau": "406",
+    "coordonnees": [
+      49.2469729,
+      4.017670499999999
+    ],
+    "nom": "Bureau 406 - Ecole Elémentaire Martin Peller",
+    "inscrits": 915,
+    "votants": 494,
+    "nuls": 1,
+    "blancs": 5,
+    "exprimé": 488,
+    "rose": 7,
+    "coradel": 32,
+    "frigout": 89,
+    "quenard": 122,
+    "robinet": 195,
+    "mura": 2,
+    "lang": 41
+  },
+  {
+    "bureau": "501",
+    "coordonnees": [
+      49.27314579999999,
+      4.0299438
+    ],
+    "nom": "Bureau 501 - Ecole Elémentaire Desbureaux",
+    "inscrits": 1178,
+    "votants": 545,
+    "nuls": 5,
+    "blancs": 4,
+    "exprimé": 536,
+    "rose": 12,
+    "coradel": 35,
+    "frigout": 106,
+    "quenard": 104,
+    "robinet": 238,
+    "mura": 5,
+    "lang": 36
+  },
+  {
+    "bureau": "502",
+    "coordonnees": [
+      49.27314579999999,
+      4.0299438
+    ],
+    "nom": "Bureau 502 - Ecole Maternelle Desbureaux",
+    "inscrits": 1025,
+    "votants": 470,
+    "nuls": 0,
+    "blancs": 2,
+    "exprimé": 468,
+    "rose": 12,
+    "coradel": 37,
+    "frigout": 102,
+    "quenard": 91,
+    "robinet": 192,
+    "mura": 7,
+    "lang": 27
+  },
+  {
+    "bureau": "503",
+    "coordonnees": [
+      49.2757611,
+      4.0312054
+    ],
+    "nom": "Bureau 503 - Ecole Maternelle SNCF",
+    "inscrits": 846,
+    "votants": 357,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 353,
+    "rose": 13,
+    "coradel": 27,
+    "frigout": 113,
+    "quenard": 36,
+    "robinet": 147,
+    "mura": 2,
+    "lang": 15
+  },
+  {
+    "bureau": "504",
+    "coordonnees": [
+      49.2825992,
+      4.0296463
+    ],
+    "nom": "Bureau 504 - Ecole Maternelle Charles Péguy",
+    "inscrits": 755,
+    "votants": 279,
+    "nuls": 2,
+    "blancs": 6,
+    "exprimé": 271,
+    "rose": 8,
+    "coradel": 28,
+    "frigout": 45,
+    "quenard": 32,
+    "robinet": 139,
+    "mura": 2,
+    "lang": 17
+  },
+  {
+    "bureau": "505",
+    "coordonnees": [
+      49.2803234,
+      4.024693699999999
+    ],
+    "nom": "Bureau 505 - Ecole Maternelle Galliéni",
+    "inscrits": 930,
+    "votants": 252,
+    "nuls": 2,
+    "blancs": 5,
+    "exprimé": 245,
+    "rose": 3,
+    "coradel": 44,
+    "frigout": 62,
+    "quenard": 42,
+    "robinet": 72,
+    "mura": 11,
+    "lang": 11
+  },
+  {
+    "bureau": "506",
+    "coordonnees": [
+      49.2803234,
+      4.024693699999999
+    ],
+    "nom": "Bureau 506 - Ecole Maternelle Galliéni",
+    "inscrits": 800,
+    "votants": 312,
+    "nuls": 0,
+    "blancs": 3,
+    "exprimé": 309,
+    "rose": 5,
+    "coradel": 49,
+    "frigout": 66,
+    "quenard": 43,
+    "robinet": 120,
+    "mura": 2,
+    "lang": 24
+  },
+  {
+    "bureau": "507",
+    "coordonnees": [
+      49.2783559,
+      4.0174511
+    ],
+    "nom": "Bureau 507 - Ecole Maternelle Charpentier",
+    "inscrits": 866,
+    "votants": 226,
+    "nuls": 1,
+    "blancs": 0,
+    "exprimé": 225,
+    "rose": 8,
+    "coradel": 22,
+    "frigout": 57,
+    "quenard": 21,
+    "robinet": 95,
+    "mura": 5,
+    "lang": 17
+  },
+  {
+    "bureau": "508",
+    "coordonnees": [
+      49.285787,
+      4.005836
+    ],
+    "nom": "Bureau 508 - Ecole Maternelle Neuvillette",
+    "inscrits": 528,
+    "votants": 279,
+    "nuls": 3,
+    "blancs": 2,
+    "exprimé": 274,
+    "rose": 7,
+    "coradel": 13,
+    "frigout": 79,
+    "quenard": 37,
+    "robinet": 118,
+    "mura": 1,
+    "lang": 19
+  },
+  {
+    "bureau": "509",
+    "coordonnees": [
+      49.28582160000001,
+      4.005306099999999
+    ],
+    "nom": "Bureau 509 - Ecole Elémentaire Neuvillette",
+    "inscrits": 694,
+    "votants": 348,
+    "nuls": 1,
+    "blancs": 2,
+    "exprimé": 345,
+    "rose": 5,
+    "coradel": 10,
+    "frigout": 99,
+    "quenard": 60,
+    "robinet": 147,
+    "mura": 3,
+    "lang": 21
+  },
+  {
+    "bureau": "510",
+    "coordonnees": [
+      49.28582160000001,
+      4.005306099999999
+    ],
+    "nom": "Bureau 510 - Ecole Elémentaire Neuvillette",
+    "inscrits": 622,
+    "votants": 281,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 277,
+    "rose": 5,
+    "coradel": 26,
+    "frigout": 72,
+    "quenard": 45,
+    "robinet": 102,
+    "mura": 2,
+    "lang": 25
+  },
+  {
+    "bureau": "601",
+    "coordonnees": [
+      49.2775562,
+      4.008236
+    ],
+    "nom": "Bureau 601 - Ecole Elémentaire Trois Fontaines",
+    "inscrits": 920,
+    "votants": 455,
+    "nuls": 4,
+    "blancs": 4,
+    "exprimé": 447,
+    "rose": 11,
+    "coradel": 21,
+    "frigout": 131,
+    "quenard": 77,
+    "robinet": 176,
+    "mura": 3,
+    "lang": 28
+  },
+  {
+    "bureau": "602",
+    "coordonnees": [
+      49.2775562,
+      4.008236
+    ],
+    "nom": "Bureau 602 - Ecole Elémentaire Trois Fontaines",
+    "inscrits": 1021,
+    "votants": 404,
+    "nuls": 5,
+    "blancs": 1,
+    "exprimé": 398,
+    "rose": 8,
+    "coradel": 35,
+    "frigout": 98,
+    "quenard": 67,
+    "robinet": 163,
+    "mura": 1,
+    "lang": 26
+  },
+  {
+    "bureau": "603",
+    "coordonnees": [
+      49.2771131,
+      4.009837399999999
+    ],
+    "nom": "Bureau 603 - Ecole Maternelle Trois Fontaines",
+    "inscrits": 1082,
+    "votants": 507,
+    "nuls": 5,
+    "blancs": 9,
+    "exprimé": 493,
+    "rose": 14,
+    "coradel": 24,
+    "frigout": 113,
+    "quenard": 76,
+    "robinet": 228,
+    "mura": 3,
+    "lang": 35
+  },
+  {
+    "bureau": "604",
+    "coordonnees": [
+      49.2652125,
+      4.0120224
+    ],
+    "nom": "Bureau 604 - Ecole Elémentaire Charles Arnould",
+    "inscrits": 1160,
+    "votants": 646,
+    "nuls": 8,
+    "blancs": 4,
+    "exprimé": 634,
+    "rose": 15,
+    "coradel": 42,
+    "frigout": 113,
+    "quenard": 113,
+    "robinet": 304,
+    "mura": 6,
+    "lang": 41
+  },
+  {
+    "bureau": "605",
+    "coordonnees": [
+      49.2702785,
+      4.015445
+    ],
+    "nom": "Bureau 605- Ecole Maternelle Jardelle",
+    "inscrits": 973,
+    "votants": 435,
+    "nuls": 5,
+    "blancs": 3,
+    "exprimé": 427,
+    "rose": 12,
+    "coradel": 25,
+    "frigout": 98,
+    "quenard": 71,
+    "robinet": 182,
+    "mura": 5,
+    "lang": 34
+  },
+  {
+    "bureau": "606",
+    "coordonnees": [
+      49.2763708,
+      4.0217862
+    ],
+    "nom": "Bureau 606 - Ecole Elémentaire Jean Macé",
+    "inscrits": 1274,
+    "votants": 629,
+    "nuls": 7,
+    "blancs": 5,
+    "exprimé": 617,
+    "rose": 6,
+    "coradel": 28,
+    "frigout": 118,
+    "quenard": 133,
+    "robinet": 282,
+    "mura": 4,
+    "lang": 46
+  },
+  {
+    "bureau": "607",
+    "coordonnees": [
+      49.26773290000001,
+      4.025648299999999
+    ],
+    "nom": "Bureau 607 - Salle Municipale Goulin",
+    "inscrits": 1050,
+    "votants": 471,
+    "nuls": 2,
+    "blancs": 0,
+    "exprimé": 469,
+    "rose": 2,
+    "coradel": 38,
+    "frigout": 106,
+    "quenard": 102,
+    "robinet": 190,
+    "mura": 1,
+    "lang": 30
+  },
+  {
+    "bureau": "608",
+    "coordonnees": [
+      49.26773290000001,
+      4.025648299999999
+    ],
+    "nom": "Bureau 608 - Salle Municipale Goulin",
+    "inscrits": 1253,
+    "votants": 598,
+    "nuls": 4,
+    "blancs": 7,
+    "exprimé": 587,
+    "rose": 9,
+    "coradel": 39,
+    "frigout": 121,
+    "quenard": 91,
+    "robinet": 273,
+    "mura": 1,
+    "lang": 53
+  },
+  {
+    "bureau": "609",
+    "coordonnees": [
+      49.2653701,
+      4.0233921
+    ],
+    "nom": "Bureau 609 - Ecole Elémentaire Anquetil",
+    "inscrits": 1250,
+    "votants": 568,
+    "nuls": 6,
+    "blancs": 5,
+    "exprimé": 557,
+    "rose": 10,
+    "coradel": 73,
+    "frigout": 87,
+    "quenard": 114,
+    "robinet": 239,
+    "mura": 5,
+    "lang": 29
+  },
+  {
+    "bureau": "610",
+    "coordonnees": [
+      49.26531319999999,
+      4.0214371
+    ],
+    "nom": "Bureau 610 - Salle Municipale Saint-Thierry",
+    "inscrits": 980,
+    "votants": 488,
+    "nuls": 3,
+    "blancs": 3,
+    "exprimé": 482,
+    "rose": 9,
+    "coradel": 33,
+    "frigout": 76,
+    "quenard": 91,
+    "robinet": 231,
+    "mura": 6,
+    "lang": 36
+  },
+  {
+    "bureau": "611",
+    "coordonnees": [
+      49.26531319999999,
+      4.0214371
+    ],
+    "nom": "Bureau 611 - Salle Municipale Saint-Thierry",
+    "inscrits": 1364,
+    "votants": 629,
+    "nuls": 4,
+    "blancs": 5,
+    "exprimé": 620,
+    "rose": 13,
+    "coradel": 54,
+    "frigout": 112,
+    "quenard": 118,
+    "robinet": 282,
+    "mura": 5,
+    "lang": 36
+  },
+  {
+    "bureau": "612",
+    "coordonnees": [
+      49.2594942,
+      4.0149514
+    ],
+    "nom": "Bureau 612 - Ecole Maternelle Clairmarais",
+    "inscrits": 1015,
+    "votants": 484,
+    "nuls": 4,
+    "blancs": 9,
+    "exprimé": 471,
+    "rose": 3,
+    "coradel": 25,
+    "frigout": 105,
+    "quenard": 106,
+    "robinet": 208,
+    "mura": 5,
+    "lang": 19
+  },
+  {
+    "bureau": "613",
+    "coordonnees": [
+      49.2602193,
+      4.0158939
+    ],
+    "nom": "Bureau 613 - Ecole Maternelle Clairmarais",
+    "inscrits": 1471,
+    "votants": 687,
+    "nuls": 0,
+    "blancs": 4,
+    "exprimé": 683,
+    "rose": 11,
+    "coradel": 72,
+    "frigout": 151,
+    "quenard": 126,
+    "robinet": 297,
+    "mura": 7,
+    "lang": 19
+  },
+  {
+    "bureau": "614",
+    "coordonnees": [
+      49.2602193,
+      4.0158939
+    ],
+    "nom": "Bureau 614 - Ecole Maternelle Clairmarais",
+    "inscrits": 1037,
+    "votants": 491,
+    "nuls": 5,
+    "blancs": 7,
+    "exprimé": 479,
+    "rose": 6,
+    "coradel": 29,
+    "frigout": 76,
+    "quenard": 99,
+    "robinet": 249,
+    "mura": 1,
+    "lang": 19
+  },
+  {
+    "bureau": "701",
+    "coordonnees": [
+      49.26889509999999,
+      4.0259254
+    ],
+    "nom": "Bureau 701 - Salle de Sport",
+    "inscrits": 942,
+    "votants": 474,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 470,
+    "rose": 6,
+    "coradel": 42,
+    "frigout": 54,
+    "quenard": 113,
+    "robinet": 223,
+    "mura": 4,
+    "lang": 28
+  },
+  {
+    "bureau": "702",
+    "coordonnees": [
+      49.26889509999999,
+      4.0259254
+    ],
+    "nom": "Bureau 702 - Salle de Sport",
+    "inscrits": 1032,
+    "votants": 497,
+    "nuls": 3,
+    "blancs": 6,
+    "exprimé": 488,
+    "rose": 7,
+    "coradel": 45,
+    "frigout": 81,
+    "quenard": 95,
+    "robinet": 238,
+    "mura": 0,
+    "lang": 22
+  },
+  {
+    "bureau": "703",
+    "coordonnees": [
+      49.2643279,
+      4.044527299999999
+    ],
+    "nom": "Bureau 703 - Amicale Jamin",
+    "inscrits": 1236,
+    "votants": 529,
+    "nuls": 2,
+    "blancs": 5,
+    "exprimé": 522,
+    "rose": 9,
+    "coradel": 27,
+    "frigout": 110,
+    "quenard": 95,
+    "robinet": 235,
+    "mura": 1,
+    "lang": 45
+  },
+  {
+    "bureau": "704",
+    "coordonnees": [
+      49.2643279,
+      4.044527299999999
+    ],
+    "nom": "Bureau 704 - Amicale Jamin",
+    "inscrits": 943,
+    "votants": 389,
+    "nuls": 3,
+    "blancs": 5,
+    "exprimé": 381,
+    "rose": 3,
+    "coradel": 22,
+    "frigout": 69,
+    "quenard": 92,
+    "robinet": 175,
+    "mura": 1,
+    "lang": 19
+  },
+  {
+    "bureau": "705",
+    "coordonnees": [
+      49.2643279,
+      4.044527299999999
+    ],
+    "nom": "Bureau 705 - Amicale Jamin",
+    "inscrits": 1036,
+    "votants": 578,
+    "nuls": 3,
+    "blancs": 3,
+    "exprimé": 572,
+    "rose": 15,
+    "coradel": 27,
+    "frigout": 105,
+    "quenard": 101,
+    "robinet": 276,
+    "mura": 5,
+    "lang": 43
+  },
+  {
+    "bureau": "706",
+    "coordonnees": [
+      49.2639408,
+      4.0485956
+    ],
+    "nom": "Bureau 706 - Ecole Maternelle Prieur de la Marne",
+    "inscrits": 961,
+    "votants": 395,
+    "nuls": 2,
+    "blancs": 1,
+    "exprimé": 392,
+    "rose": 6,
+    "coradel": 28,
+    "frigout": 66,
+    "quenard": 95,
+    "robinet": 165,
+    "mura": 0,
+    "lang": 32
+  },
+  {
+    "bureau": "707",
+    "coordonnees": [
+      49.2639408,
+      4.0485956
+    ],
+    "nom": "Bureau 707 - Ecole Maternelle Prieur de la Marne",
+    "inscrits": 1184,
+    "votants": 548,
+    "nuls": 0,
+    "blancs": 1,
+    "exprimé": 547,
+    "rose": 9,
+    "coradel": 34,
+    "frigout": 185,
+    "quenard": 77,
+    "robinet": 203,
+    "mura": 0,
+    "lang": 39
+  },
+  {
+    "bureau": "708",
+    "coordonnees": [
+      49.267666,
+      4.069099599999999
+    ],
+    "nom": "Bureau 708 - Ecole Maternelle Paul Bert",
+    "inscrits": 635,
+    "votants": 186,
+    "nuls": 1,
+    "blancs": 4,
+    "exprimé": 181,
+    "rose": 5,
+    "coradel": 20,
+    "frigout": 39,
+    "quenard": 17,
+    "robinet": 91,
+    "mura": 3,
+    "lang": 6
+  },
+  {
+    "bureau": "709",
+    "coordonnees": [
+      49.267371,
+      4.069382
+    ],
+    "nom": "Bureau 709 - Ecole Elémentaire Paul Bert",
+    "inscrits": 711,
+    "votants": 313,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 309,
+    "rose": 4,
+    "coradel": 32,
+    "frigout": 84,
+    "quenard": 43,
+    "robinet": 118,
+    "mura": 4,
+    "lang": 24
+  },
+  {
+    "bureau": "710",
+    "coordonnees": [
+      49.2612551,
+      4.057214399999999
+    ],
+    "nom": "Bureau 710 - Ecole Elémentaire Dauphinot",
+    "inscrits": 978,
+    "votants": 510,
+    "nuls": 3,
+    "blancs": 8,
+    "exprimé": 499,
+    "rose": 15,
+    "coradel": 30,
+    "frigout": 81,
+    "quenard": 107,
+    "robinet": 221,
+    "mura": 2,
+    "lang": 43
+  },
+  {
+    "bureau": "711",
+    "coordonnees": [
+      49.2612551,
+      4.057214399999999
+    ],
+    "nom": "Bureau 711 - Ecole Elémentaire Dauphinot",
+    "inscrits": 924,
+    "votants": 437,
+    "nuls": 1,
+    "blancs": 1,
+    "exprimé": 435,
+    "rose": 14,
+    "coradel": 29,
+    "frigout": 114,
+    "quenard": 72,
+    "robinet": 174,
+    "mura": 2,
+    "lang": 30
+  },
+  {
+    "bureau": "712",
+    "coordonnees": [
+      49.2616244,
+      4.0576912
+    ],
+    "nom": "Bureau 712 - Ecole Elémentaire Dauphinot",
+    "inscrits": 1007,
+    "votants": 406,
+    "nuls": 1,
+    "blancs": 4,
+    "exprimé": 401,
+    "rose": 7,
+    "coradel": 32,
+    "frigout": 115,
+    "quenard": 72,
+    "robinet": 143,
+    "mura": 1,
+    "lang": 31
+  },
+  {
+    "bureau": "713",
+    "coordonnees": [
+      49.2616244,
+      4.0576912
+    ],
+    "nom": "Bureau 713 - Ecole Elémentaire Dauphinot",
+    "inscrits": 1176,
+    "votants": 479,
+    "nuls": 0,
+    "blancs": 4,
+    "exprimé": 475,
+    "rose": 8,
+    "coradel": 42,
+    "frigout": 156,
+    "quenard": 57,
+    "robinet": 163,
+    "mura": 2,
+    "lang": 47
+  },
+  {
+    "bureau": "714",
+    "coordonnees": [
+      49.2588043,
+      4.0482059
+    ],
+    "nom": "Bureau 714 - Ecole Elémentaire Carteret",
+    "inscrits": 1071,
+    "votants": 565,
+    "nuls": 6,
+    "blancs": 6,
+    "exprimé": 553,
+    "rose": 12,
+    "coradel": 24,
+    "frigout": 126,
+    "quenard": 122,
+    "robinet": 221,
+    "mura": 1,
+    "lang": 47
+  },
+  {
+    "bureau": "715",
+    "coordonnees": [
+      49.2588043,
+      4.0482059
+    ],
+    "nom": "Bureau 715 - Ecole Elémentaire Carteret",
+    "inscrits": 975,
+    "votants": 451,
+    "nuls": 1,
+    "blancs": 3,
+    "exprimé": 447,
+    "rose": 8,
+    "coradel": 44,
+    "frigout": 80,
+    "quenard": 87,
+    "robinet": 187,
+    "mura": 2,
+    "lang": 39
+  },
+  {
+    "bureau": "716",
+    "coordonnees": [
+      49.2558549,
+      4.057081999999999
+    ],
+    "nom": "Bureau 716 - Ecole Maternelle Général Carré",
+    "inscrits": 994,
+    "votants": 442,
+    "nuls": 5,
+    "blancs": 2,
+    "exprimé": 435,
+    "rose": 6,
+    "coradel": 38,
+    "frigout": 136,
+    "quenard": 56,
+    "robinet": 157,
+    "mura": 4,
+    "lang": 38
+  },
+  {
+    "bureau": "717",
+    "coordonnees": [
+      49.2558549,
+      4.057081999999999
+    ],
+    "nom": "Bureau 717 - Ecole Maternelle Général Carré",
+    "inscrits": 1254,
+    "votants": 381,
+    "nuls": 0,
+    "blancs": 7,
+    "exprimé": 374,
+    "rose": 10,
+    "coradel": 21,
+    "frigout": 150,
+    "quenard": 39,
+    "robinet": 137,
+    "mura": 3,
+    "lang": 14
+  },
+  {
+    "bureau": "801",
+    "coordonnees": [
+      49.23544649999999,
+      4.047439
+    ],
+    "nom": "Bureau 801 - Ecole Elémentaire Jules Ferry",
+    "inscrits": 1002,
+    "votants": 425,
+    "nuls": 6,
+    "blancs": 1,
+    "exprimé": 418,
+    "rose": 10,
+    "coradel": 25,
+    "frigout": 131,
+    "quenard": 69,
+    "robinet": 139,
+    "mura": 3,
+    "lang": 41
+  },
+  {
+    "bureau": "802",
+    "coordonnees": [
+      49.22489849999999,
+      4.0401455
+    ],
+    "nom": "Bureau 802 - Ecole Elémentaire Tixier-Mougne",
+    "inscrits": 758,
+    "votants": 202,
+    "nuls": 0,
+    "blancs": 5,
+    "exprimé": 197,
+    "rose": 3,
+    "coradel": 13,
+    "frigout": 60,
+    "quenard": 27,
+    "robinet": 78,
+    "mura": 7,
+    "lang": 9
+  },
+  {
+    "bureau": "803",
+    "coordonnees": [
+      49.22489849999999,
+      4.0401455
+    ],
+    "nom": "Bureau 803 - Ecole Elémentaire Tixier-Mougne",
+    "inscrits": 857,
+    "votants": 236,
+    "nuls": 5,
+    "blancs": 1,
+    "exprimé": 230,
+    "rose": 4,
+    "coradel": 22,
+    "frigout": 74,
+    "quenard": 26,
+    "robinet": 75,
+    "mura": 10,
+    "lang": 19
+  },
+  {
+    "bureau": "804",
+    "coordonnees": [
+      49.22134339999999,
+      4.0371549
+    ],
+    "nom": "Bureau 804 - Ecole Maternelle La Pérouse",
+    "inscrits": 870,
+    "votants": 351,
+    "nuls": 3,
+    "blancs": 5,
+    "exprimé": 343,
+    "rose": 3,
+    "coradel": 31,
+    "frigout": 105,
+    "quenard": 55,
+    "robinet": 115,
+    "mura": 16,
+    "lang": 18
+  },
+  {
+    "bureau": "805",
+    "coordonnees": [
+      49.22811859999999,
+      4.0334885
+    ],
+    "nom": "Bureau 805 - Ecole Maternelle Vasco de Gama",
+    "inscrits": 727,
+    "votants": 261,
+    "nuls": 2,
+    "blancs": 2,
+    "exprimé": 257,
+    "rose": 3,
+    "coradel": 20,
+    "frigout": 79,
+    "quenard": 27,
+    "robinet": 101,
+    "mura": 9,
+    "lang": 18
+  },
+  {
+    "bureau": "901",
+    "coordonnees": [
+      49.2347213,
+      4.0312326
+    ],
+    "nom": "Bureau 901 - Ecole Elémentaire Barthou",
+    "inscrits": 948,
+    "votants": 411,
+    "nuls": 7,
+    "blancs": 7,
+    "exprimé": 397,
+    "rose": 6,
+    "coradel": 30,
+    "frigout": 102,
+    "quenard": 75,
+    "robinet": 153,
+    "mura": 10,
+    "lang": 21
+  },
+  {
+    "bureau": "902",
+    "coordonnees": [
+      49.2389853,
+      4.0315521
+    ],
+    "nom": "Bureau 902 - Ecole Elémentaire Louvois",
+    "inscrits": 970,
+    "votants": 422,
+    "nuls": 2,
+    "blancs": 8,
+    "exprimé": 412,
+    "rose": 10,
+    "coradel": 50,
+    "frigout": 112,
+    "quenard": 76,
+    "robinet": 126,
+    "mura": 11,
+    "lang": 27
+  },
+  {
+    "bureau": "903",
+    "coordonnees": [
+      49.2389853,
+      4.0315521
+    ],
+    "nom": "Bureau 903 - Ecole Elémentaire Louvois",
+    "inscrits": 1006,
+    "votants": 437,
+    "nuls": 3,
+    "blancs": 6,
+    "exprimé": 428,
+    "rose": 9,
+    "coradel": 42,
+    "frigout": 65,
+    "quenard": 80,
+    "robinet": 196,
+    "mura": 3,
+    "lang": 33
+  },
+  {
+    "bureau": "904",
+    "coordonnees": [
+      49.2453669,
+      4.0372902
+    ],
+    "nom": "Bureau 904 - Ecole Elémentaire Ruisselet",
+    "inscrits": 840,
+    "votants": 397,
+    "nuls": 4,
+    "blancs": 4,
+    "exprimé": 389,
+    "rose": 3,
+    "coradel": 31,
+    "frigout": 79,
+    "quenard": 88,
+    "robinet": 158,
+    "mura": 5,
+    "lang": 25
+  },
+  {
+    "bureau": "905",
+    "coordonnees": [
+      49.2453669,
+      4.0372902
+    ],
+    "nom": "Bureau 905 - Ecole Elémentaire Ruisselet",
+    "inscrits": 911,
+    "votants": 519,
+    "nuls": 4,
+    "blancs": 8,
+    "exprimé": 507,
+    "rose": 9,
+    "coradel": 29,
+    "frigout": 69,
+    "quenard": 101,
+    "robinet": 238,
+    "mura": 4,
+    "lang": 57
+  },
+  {
+    "bureau": "906",
+    "coordonnees": [
+      49.2415312,
+      4.0390089
+    ],
+    "nom": "Bureau 906 - Ecole Elémentaire Tournebonneau",
+    "inscrits": 779,
+    "votants": 352,
+    "nuls": 0,
+    "blancs": 12,
+    "exprimé": 340,
+    "rose": 4,
+    "coradel": 15,
+    "frigout": 70,
+    "quenard": 60,
+    "robinet": 154,
+    "mura": 5,
+    "lang": 32
+  },
+  {
+    "bureau": "907",
+    "coordonnees": [
+      49.2415312,
+      4.0390089
+    ],
+    "nom": "Bureau 907 - Ecole Elémentaire Tournebonneau",
+    "inscrits": 798,
+    "votants": 424,
+    "nuls": 1,
+    "blancs": 5,
+    "exprimé": 418,
+    "rose": 0,
+    "coradel": 20,
+    "frigout": 66,
+    "quenard": 85,
+    "robinet": 211,
+    "mura": 3,
+    "lang": 33
+  },
+  {
+    "bureau": "908",
+    "coordonnees": [
+      49.2462753,
+      4.0414118
+    ],
+    "nom": "Bureau 908 - Maison de la Vie Associative",
+    "inscrits": 1028,
+    "votants": 499,
+    "nuls": 11,
+    "blancs": 2,
+    "exprimé": 486,
+    "rose": 4,
+    "coradel": 38,
+    "frigout": 90,
+    "quenard": 101,
+    "robinet": 207,
+    "mura": 3,
+    "lang": 43
+  },
+  {
+    "bureau": "909",
+    "coordonnees": [
+      49.2462753,
+      4.0414118
+    ],
+    "nom": "Bureau 909 - Maison de la Vie Associative",
+    "inscrits": 836,
+    "votants": 422,
+    "nuls": 3,
+    "blancs": 2,
+    "exprimé": 417,
+    "rose": 7,
+    "coradel": 31,
+    "frigout": 58,
+    "quenard": 82,
+    "robinet": 195,
+    "mura": 3,
+    "lang": 41
+  },
+  {
+    "bureau": "910",
+    "coordonnees": [
+      49.2500332,
+      4.0540109
+    ],
+    "nom": "Bureau 910 - Ecole Maternelle Yser",
+    "inscrits": 1062,
+    "votants": 489,
+    "nuls": 4,
+    "blancs": 10,
+    "exprimé": 475,
+    "rose": 9,
+    "coradel": 17,
+    "frigout": 151,
+    "quenard": 66,
+    "robinet": 184,
+    "mura": 8,
+    "lang": 40
+  },
+  {
+    "bureau": "911",
+    "coordonnees": [
+      49.2500332,
+      4.0540109
+    ],
+    "nom": "Bureau 911 - Ecole Maternelle Yser",
+    "inscrits": 966,
+    "votants": 378,
+    "nuls": 2,
+    "blancs": 0,
+    "exprimé": 376,
+    "rose": 6,
+    "coradel": 21,
+    "frigout": 171,
+    "quenard": 42,
+    "robinet": 113,
+    "mura": 1,
+    "lang": 22
+  },
+  {
+    "bureau": "912",
+    "coordonnees": [
+      49.248818,
+      4.0643313
+    ],
+    "nom": "Bureau 912 - Ecole Elémentaire Adriatique",
+    "inscrits": 1008,
+    "votants": 442,
+    "nuls": 5,
+    "blancs": 3,
+    "exprimé": 434,
+    "rose": 6,
+    "coradel": 28,
+    "frigout": 116,
+    "quenard": 94,
+    "robinet": 156,
+    "mura": 2,
+    "lang": 32
+  },
+  {
+    "bureau": "913",
+    "coordonnees": [
+      49.2543704,
+      4.0643274
+    ],
+    "nom": "Bureau 913 - Ecole Maternelle Danube",
+    "inscrits": 1139,
+    "votants": 411,
+    "nuls": 6,
+    "blancs": 2,
+    "exprimé": 403,
+    "rose": 7,
+    "coradel": 22,
+    "frigout": 137,
+    "quenard": 58,
+    "robinet": 145,
+    "mura": 4,
+    "lang": 30
+  },
+  {
+    "bureau": "914",
+    "coordonnees": [
+      49.23240260000001,
+      4.0476656
+    ],
+    "nom": "Bureau 914 - Salle Moulin Huon",
+    "inscrits": 681,
+    "votants": 275,
+    "nuls": 2,
+    "blancs": 9,
+    "exprimé": 264,
+    "rose": 3,
+    "coradel": 6,
+    "frigout": 80,
+    "quenard": 27,
+    "robinet": 133,
+    "mura": 1,
+    "lang": 14
+  }
+        ];
         
-        // Initialisation
-        initMap();
+        currentData = voteData;
+        candidatesList = detectCandidates(voteData);
         
-        // Exemple de données par défaut (pour test)
-        setTimeout(() => {
-            const defaultData = [
-                {
-                    "Bureau": "101",
-                    "Geo": [49.2584032, 4.0322568],
-                    "ROSE": 5,
-                    "CORADEL": 28,
-                    "FRIGOUT": 54,
-                    "QUENARD": 103,
-                    "ROBINET": 425,
-                    "MURA": 4,
-                    "LANG": 50,
-                    "Inscrits": 1120,
-                    "Votants": 682
-                },
-                {
-                    "Bureau": "102",
-                    "Geo": [49.2604032, 4.0352568],
-                    "ROSE": 2,
-                    "CORADEL": 15,
-                    "FRIGOUT": 54,
-                    "QUENARD": 97,
-                    "ROBINET": 360,
-                    "MURA": 1,
-                    "LANG": 53,
-                    "Inscrits": 1048,
-                    "Votants": 587
-                },
-                {
-                    "Bureau": "103",
-                    "Geo": [49.2554032, 4.0302568],
-                    "ROSE": 8,
-                    "CORADEL": 20,
-                    "FRIGOUT": 45,
-                    "QUENARD": 110,
-                    "ROBINET": 380,
-                    "MURA": 6,
-                    "LANG": 42,
-                    "Inscrits": 1150,
-                    "Votants": 645
-                }
-            ];
-            
-            processData(defaultData);
-            document.getElementById('file-info').innerHTML = 
-                '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
-        }, 1000);
-    </script>
+        if (candidatesList.length > 0) {
+            currentCandidate = candidatesList[0];
+        }
+        
+        document.getElementById('candidates-panel').style.display = 'block';
+        document.getElementById('file-info').innerHTML = 
+            '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
+        
+        updateCandidatesList();
+        updateMap();
+        map.on('zoomend', function (e) {
+    console.log(e.target._zoom);
+});
+    }, 1000);
+    
+</script>
 </body>
 </html>
