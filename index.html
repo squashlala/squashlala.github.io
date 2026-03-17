@@ -719,6 +719,7 @@
                 map.fitBounds([southWest, northEast], { padding: [50, 50] });
             }
             
+            if (["abstention", "majority"].includes(currentMode)){}
             updateStats();
         }
 
@@ -731,7 +732,7 @@
             let maxBureau = '';
             
             currentData.forEach(bureau => {
-                const value = getCandidateValue(bureau, currentCandidate);
+                const value = getCandidateValue(bureau.candidats, currentCandidate);
                 total += value;
                 
                 if (value > max) {
@@ -741,13 +742,26 @@
             });
             
             const statsDiv = document.getElementById('stats');
-            statsDiv.innerHTML = `
-                <h4>Statistiques - ${currentCandidate.toUpperCase()}</h4>
-                <p><strong>Total voix:</strong> ${total}</p>
-                <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
-                <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
+            console.log(currentMode)
+            if (currentMode === 'abstention'){
+              statsDiv.innerHTML = `
                 <p><strong>Bureaux:</strong> ${currentData.length}</p>
-            `;
+              `;
+            } else if (currentMode === 'majority') {
+              statsDiv.innerHTML = `
+                <p><strong>Candidats:</strong> ${candidatesList.length}</p>
+                <p><strong>Bureaux:</strong> ${currentData.length}</p>
+              `
+            }
+            else {
+              statsDiv.innerHTML = `
+                  <h4>Statistiques - ${currentCandidate.toUpperCase()}</h4>
+                  <p><strong>Total voix:</strong> ${total}</p>
+                  <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
+                  <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
+                  <p><strong>Bureaux:</strong> ${currentData.length}</p>
+              `;
+            }
         }
 
         // Mettre à jour la liste des candidats
@@ -769,6 +783,21 @@
                 };
                 container.appendChild(div);
             });
+        }
+        async function readJsonFile(filePath) {
+            try {
+                const response = await fetch(filePath)
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load file: ${response.status}`)
+                }
+
+                const jsonData = await response.json()
+                return jsonData
+            } catch (error) {
+                console.error('Error reading JSON file:', error)
+                throw error
+            }
         }
 
         // Gestionnaire d'upload
@@ -827,6 +856,7 @@
                 
                 if (currentMode === 'candidates') {
                     document.getElementById('candidate-list').style.display = 'block';
+                    document.getElementById('candidate-list').style.display = 'block';
                 } else {
                     document.getElementById('candidate-list').style.display = 'none';
                 }
@@ -871,18 +901,27 @@
                   }
               }
             ]
-            currentData = exempleData;
-            candidatesList = detectCandidates(exempleData);
-            if (candidatesList.length > 0) {
-                currentCandidate = candidatesList[0];
-            }
             
-            document.getElementById('candidates-panel').style.display = 'block';
-            document.getElementById('file-info').innerHTML = 
-                '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
+            readJsonFile('/reims_T1.json')
+                .then(data => {
+                    currentData = data;
+                    candidatesList = detectCandidates(currentData);
+                    if (candidatesList.length > 0) {
+                        currentCandidate = candidatesList[0];
+                    }
+                    
+                    document.getElementById('candidates-panel').style.display = 'block';
+                    document.getElementById('file-info').innerHTML = 
+                        '<span class="success"><i class="fas fa-info-circle"></i> Reims, 1er tour, 2026</span>';
+                    
+                    updateCandidatesList();
+                    updateMap();
+                })
+                .catch(error => {
+                    console.error('Failed to load configuration:', error)
+                })
+            // currentData = exempleData;
             
-            updateCandidatesList();
-            updateMap();
         }, 1000);
     </script>
 </body>

@@ -12,13 +12,13 @@
         "blancs": 7,
         "exprimé": 669,
         "candidats": {
-            "rose": 5,
-            "coradel": 28,
-            "frigout": 54,
-            "quenard": 103,
-            "robinet": 425,
-            "mura": 4,
-            "lang": 50
+            "t. rose": 5,
+            "p. coradel": 28,
+            "a. s. frigout": 54,
+            "e. quenard": 103,
+            "a. robinet": 425,
+            "s. mura": 4,
+            "s. lang": 50
         }
     },
     {
@@ -34,13 +34,13 @@
         "blancs": 4,
         "exprimé": 582,
         "candidats": {
-            "rose": 2,
-            "coradel": 15,
-            "frigout": 54,
-            "quenard": 97,
-            "robinet": 360,
-            "mura": 1,
-            "lang": 53
+            "t. rose": 2,
+            "p. coradel": 15,
+            "a. s. frigout": 54,
+            "e. quenard": 97,
+            "a. robinet": 360,
+            "s. mura": 1,
+            "s. lang": 53
         }
     },
     {
@@ -56,13 +56,13 @@
         "blancs": 2,
         "exprimé": 524,
         "candidats": {
-            "rose": 2,
-            "coradel": 31,
-            "frigout": 59,
-            "quenard": 83,
-            "robinet": 304,
-            "mura": 2,
-            "lang": 43
+            "t. rose": 2,
+            "p. coradel": 31,
+            "a. s. frigout": 59,
+            "e. quenard": 83,
+            "a. robinet": 304,
+            "s. mura": 2,
+            "s. lang": 43
         }
     },
     {
@@ -78,13 +78,13 @@
         "blancs": 6,
         "exprimé": 509,
         "candidats": {
-            "rose": 13,
-            "coradel": 34,
-            "frigout": 59,
-            "quenard": 86,
-            "robinet": 280,
-            "mura": 2,
-            "lang": 35
+            "t. rose": 13,
+            "p. coradel": 34,
+            "a. s. frigout": 59,
+            "e. quenard": 86,
+            "a. robinet": 280,
+            "s. mura": 2,
+            "s. lang": 35
         }
     },
     {
@@ -100,13 +100,13 @@
         "blancs": 5,
         "exprimé": 467,
         "candidats": {
-            "rose": 4,
-            "coradel": 21,
-            "frigout": 87,
-            "quenard": 104,
-            "robinet": 204,
-            "mura": 2,
-            "lang": 45
+            "t. rose": 4,
+            "p. coradel": 21,
+            "a. s. frigout": 87,
+            "e. quenard": 104,
+            "a. robinet": 204,
+            "s. mura": 2,
+            "s. lang": 45
         }
     },
     {
@@ -122,13 +122,13 @@
         "blancs": 11,
         "exprimé": 585,
         "candidats": {
-            "rose": 4,
-            "coradel": 42,
-            "frigout": 66,
-            "quenard": 131,
-            "robinet": 279,
-            "mura": 3,
-            "lang": 60
+            "t. rose": 4,
+            "p. coradel": 42,
+            "a. s. frigout": 66,
+            "e. quenard": 131,
+            "a. robinet": 279,
+            "s. mura": 3,
+            "s. lang": 60
         }
     },
     {
@@ -144,13 +144,13 @@
         "blancs": 5,
         "exprimé": 526,
         "candidats": {
-            "rose": 4,
-            "coradel": 35,
-            "frigout": 98,
-            "quenard": 122,
-            "robinet": 209,
-            "mura": 5,
-            "lang": 53
+            "t. rose": 4,
+            "p. coradel": 35,
+            "a. s. frigout": 98,
+            "e. quenard": 122,
+            "a. robinet": 209,
+            "s. mura": 5,
+            "s. lang": 53
         }
     },
     {
@@ -166,13 +166,13 @@
         "blancs": 2,
         "exprimé": 502,
         "candidats": {
-            "rose": 4,
-            "coradel": 30,
-            "frigout": 56,
-            "quenard": 117,
-            "robinet": 223,
-            "mura": 5,
-            "lang": 67
+            "t. rose": 4,
+            "p. coradel": 30,
+            "a. s. frigout": 56,
+            "e. quenard": 117,
+            "a. robinet": 223,
+            "s. mura": 5,
+            "s. lang": 67
         }
     },
     {
@@ -188,13 +188,13 @@
         "blancs": 3,
         "exprimé": 481,
         "candidats": {
-            "rose": 5,
-            "coradel": 18,
-            "frigout": 57,
-            "quenard": 82,
-            "robinet": 261,
-            "mura": 1,
-            "lang": 57
+            "t. rose": 5,
+            "p. coradel": 18,
+            "a. s. frigout": 57,
+            "e. quenard": 82,
+            "a. robinet": 261,
+            "s. mura": 1,
+            "s. lang": 57
         }
     },
     {
@@ -210,13 +210,13 @@
         "blancs": 7,
         "exprimé": 647,
         "candidats": {
-            "rose": 4,
-            "coradel": 24,
-            "frigout": 61,
-            "quenard": 100,
-            "robinet": 403,
-            "mura": 0,
-            "lang": 55
+            "t. rose": 4,
+            "p. coradel": 24,
+            "a. s. frigout": 61,
+            "e. quenard": 100,
+            "a. robinet": 403,
+            "s. mura": 0,
+            "s. lang": 55
         }
     },
     {
@@ -232,13 +232,13 @@
         "blancs": 10,
         "exprimé": 694,
         "candidats": {
-            "rose": 5,
-            "coradel": 25,
-            "frigout": 92,
-            "quenard": 99,
-            "robinet": 416,
-            "mura": 1,
-            "lang": 56
+            "t. rose": 5,
+            "p. coradel": 25,
+            "a. s. frigout": 92,
+            "e. quenard": 99,
+            "a. robinet": 416,
+            "s. mura": 1,
+            "s. lang": 56
         }
     },
     {
@@ -254,13 +254,13 @@
         "blancs": 8,
         "exprimé": 660,
         "candidats": {
-            "rose": 8,
-            "coradel": 34,
-            "frigout": 112,
-            "quenard": 126,
-            "robinet": 320,
-            "mura": 6,
-            "lang": 54
+            "t. rose": 8,
+            "p. coradel": 34,
+            "a. s. frigout": 112,
+            "e. quenard": 126,
+            "a. robinet": 320,
+            "s. mura": 6,
+            "s. lang": 54
         }
     },
     {
@@ -276,13 +276,13 @@
         "blancs": 4,
         "exprimé": 520,
         "candidats": {
-            "rose": 2,
-            "coradel": 19,
-            "frigout": 75,
-            "quenard": 112,
-            "robinet": 233,
-            "mura": 2,
-            "lang": 77
+            "t. rose": 2,
+            "p. coradel": 19,
+            "a. s. frigout": 75,
+            "e. quenard": 112,
+            "a. robinet": 233,
+            "s. mura": 2,
+            "s. lang": 77
         }
     },
     {
@@ -298,13 +298,13 @@
         "blancs": 7,
         "exprimé": 564,
         "candidats": {
-            "rose": 5,
-            "coradel": 22,
-            "frigout": 83,
-            "quenard": 113,
-            "robinet": 274,
-            "mura": 4,
-            "lang": 63
+            "t. rose": 5,
+            "p. coradel": 22,
+            "a. s. frigout": 83,
+            "e. quenard": 113,
+            "a. robinet": 274,
+            "s. mura": 4,
+            "s. lang": 63
         }
     },
     {
@@ -320,13 +320,13 @@
         "blancs": 8,
         "exprimé": 445,
         "candidats": {
-            "rose": 2,
-            "coradel": 27,
-            "frigout": 85,
-            "quenard": 81,
-            "robinet": 206,
-            "mura": 3,
-            "lang": 41
+            "t. rose": 2,
+            "p. coradel": 27,
+            "a. s. frigout": 85,
+            "e. quenard": 81,
+            "a. robinet": 206,
+            "s. mura": 3,
+            "s. lang": 41
         }
     },
     {
@@ -342,13 +342,13 @@
         "blancs": 4,
         "exprimé": 621,
         "candidats": {
-            "rose": 6,
-            "coradel": 18,
-            "frigout": 82,
-            "quenard": 96,
-            "robinet": 338,
-            "mura": 1,
-            "lang": 80
+            "t. rose": 6,
+            "p. coradel": 18,
+            "a. s. frigout": 82,
+            "e. quenard": 96,
+            "a. robinet": 338,
+            "s. mura": 1,
+            "s. lang": 80
         }
     },
     {
@@ -364,13 +364,13 @@
         "blancs": 2,
         "exprimé": 330,
         "candidats": {
-            "rose": 5,
-            "coradel": 25,
-            "frigout": 53,
-            "quenard": 64,
-            "robinet": 142,
-            "mura": 0,
-            "lang": 41
+            "t. rose": 5,
+            "p. coradel": 25,
+            "a. s. frigout": 53,
+            "e. quenard": 64,
+            "a. robinet": 142,
+            "s. mura": 0,
+            "s. lang": 41
         }
     },
     {
@@ -386,13 +386,13 @@
         "blancs": 3,
         "exprimé": 344,
         "candidats": {
-            "rose": 10,
-            "coradel": 85,
-            "frigout": 43,
-            "quenard": 60,
-            "robinet": 106,
-            "mura": 23,
-            "lang": 17
+            "t. rose": 10,
+            "p. coradel": 85,
+            "a. s. frigout": 43,
+            "e. quenard": 60,
+            "a. robinet": 106,
+            "s. mura": 23,
+            "s. lang": 17
         }
     },
     {
@@ -408,13 +408,13 @@
         "blancs": 2,
         "exprimé": 330,
         "candidats": {
-            "rose": 9,
-            "coradel": 50,
-            "frigout": 79,
-            "quenard": 57,
-            "robinet": 108,
-            "mura": 5,
-            "lang": 22
+            "t. rose": 9,
+            "p. coradel": 50,
+            "a. s. frigout": 79,
+            "e. quenard": 57,
+            "a. robinet": 108,
+            "s. mura": 5,
+            "s. lang": 22
         }
     },
     {
@@ -430,13 +430,13 @@
         "blancs": 2,
         "exprimé": 322,
         "candidats": {
-            "rose": 6,
-            "coradel": 42,
-            "frigout": 75,
-            "quenard": 50,
-            "robinet": 111,
-            "mura": 18,
-            "lang": 20
+            "t. rose": 6,
+            "p. coradel": 42,
+            "a. s. frigout": 75,
+            "e. quenard": 50,
+            "a. robinet": 111,
+            "s. mura": 18,
+            "s. lang": 20
         }
     },
     {
@@ -452,13 +452,13 @@
         "blancs": 5,
         "exprimé": 454,
         "candidats": {
-            "rose": 14,
-            "coradel": 29,
-            "frigout": 164,
-            "quenard": 80,
-            "robinet": 139,
-            "mura": 4,
-            "lang": 24
+            "t. rose": 14,
+            "p. coradel": 29,
+            "a. s. frigout": 164,
+            "e. quenard": 80,
+            "a. robinet": 139,
+            "s. mura": 4,
+            "s. lang": 24
         }
     },
     {
@@ -474,13 +474,13 @@
         "blancs": 4,
         "exprimé": 397,
         "candidats": {
-            "rose": 13,
-            "coradel": 23,
-            "frigout": 165,
-            "quenard": 40,
-            "robinet": 131,
-            "mura": 9,
-            "lang": 16
+            "t. rose": 13,
+            "p. coradel": 23,
+            "a. s. frigout": 165,
+            "e. quenard": 40,
+            "a. robinet": 131,
+            "s. mura": 9,
+            "s. lang": 16
         }
     },
     {
@@ -496,13 +496,13 @@
         "blancs": 7,
         "exprimé": 559,
         "candidats": {
-            "rose": 7,
-            "coradel": 24,
-            "frigout": 135,
-            "quenard": 104,
-            "robinet": 246,
-            "mura": 6,
-            "lang": 37
+            "t. rose": 7,
+            "p. coradel": 24,
+            "a. s. frigout": 135,
+            "e. quenard": 104,
+            "a. robinet": 246,
+            "s. mura": 6,
+            "s. lang": 37
         }
     },
     {
@@ -518,13 +518,13 @@
         "blancs": 4,
         "exprimé": 489,
         "candidats": {
-            "rose": 7,
-            "coradel": 25,
-            "frigout": 111,
-            "quenard": 103,
-            "robinet": 213,
-            "mura": 5,
-            "lang": 25
+            "t. rose": 7,
+            "p. coradel": 25,
+            "a. s. frigout": 111,
+            "e. quenard": 103,
+            "a. robinet": 213,
+            "s. mura": 5,
+            "s. lang": 25
         }
     },
     {
@@ -540,13 +540,13 @@
         "blancs": 3,
         "exprimé": 516,
         "candidats": {
-            "rose": 10,
-            "coradel": 27,
-            "frigout": 133,
-            "quenard": 65,
-            "robinet": 241,
-            "mura": 5,
-            "lang": 35
+            "t. rose": 10,
+            "p. coradel": 27,
+            "a. s. frigout": 133,
+            "e. quenard": 65,
+            "a. robinet": 241,
+            "s. mura": 5,
+            "s. lang": 35
         }
     },
     {
@@ -562,13 +562,13 @@
         "blancs": 0,
         "exprimé": 415,
         "candidats": {
-            "rose": 6,
-            "coradel": 20,
-            "frigout": 119,
-            "quenard": 68,
-            "robinet": 169,
-            "mura": 3,
-            "lang": 30
+            "t. rose": 6,
+            "p. coradel": 20,
+            "a. s. frigout": 119,
+            "e. quenard": 68,
+            "a. robinet": 169,
+            "s. mura": 3,
+            "s. lang": 30
         }
     },
     {
@@ -584,13 +584,13 @@
         "blancs": 8,
         "exprimé": 352,
         "candidats": {
-            "rose": 6,
-            "coradel": 24,
-            "frigout": 101,
-            "quenard": 41,
-            "robinet": 143,
-            "mura": 7,
-            "lang": 30
+            "t. rose": 6,
+            "p. coradel": 24,
+            "a. s. frigout": 101,
+            "e. quenard": 41,
+            "a. robinet": 143,
+            "s. mura": 7,
+            "s. lang": 30
         }
     },
     {
@@ -606,13 +606,13 @@
         "blancs": 1,
         "exprimé": 399,
         "candidats": {
-            "rose": 6,
-            "coradel": 22,
-            "frigout": 77,
-            "quenard": 81,
-            "robinet": 187,
-            "mura": 8,
-            "lang": 18
+            "t. rose": 6,
+            "p. coradel": 22,
+            "a. s. frigout": 77,
+            "e. quenard": 81,
+            "a. robinet": 187,
+            "s. mura": 8,
+            "s. lang": 18
         }
     },
     {
@@ -628,13 +628,13 @@
         "blancs": 2,
         "exprimé": 460,
         "candidats": {
-            "rose": 9,
-            "coradel": 39,
-            "frigout": 94,
-            "quenard": 82,
-            "robinet": 192,
-            "mura": 6,
-            "lang": 38
+            "t. rose": 9,
+            "p. coradel": 39,
+            "a. s. frigout": 94,
+            "e. quenard": 82,
+            "a. robinet": 192,
+            "s. mura": 6,
+            "s. lang": 38
         }
     },
     {
@@ -650,13 +650,13 @@
         "blancs": 3,
         "exprimé": 480,
         "candidats": {
-            "rose": 6,
-            "coradel": 15,
-            "frigout": 88,
-            "quenard": 100,
-            "robinet": 206,
-            "mura": 1,
-            "lang": 64
+            "t. rose": 6,
+            "p. coradel": 15,
+            "a. s. frigout": 88,
+            "e. quenard": 100,
+            "a. robinet": 206,
+            "s. mura": 1,
+            "s. lang": 64
         }
     },
     {
@@ -672,13 +672,13 @@
         "blancs": 2,
         "exprimé": 578,
         "candidats": {
-            "rose": 10,
-            "coradel": 24,
-            "frigout": 100,
-            "quenard": 137,
-            "robinet": 249,
-            "mura": 1,
-            "lang": 57
+            "t. rose": 10,
+            "p. coradel": 24,
+            "a. s. frigout": 100,
+            "e. quenard": 137,
+            "a. robinet": 249,
+            "s. mura": 1,
+            "s. lang": 57
         }
     },
     {
@@ -694,13 +694,13 @@
         "blancs": 3,
         "exprimé": 130,
         "candidats": {
-            "rose": 1,
-            "coradel": 13,
-            "frigout": 35,
-            "quenard": 38,
-            "robinet": 30,
-            "mura": 3,
-            "lang": 10
+            "t. rose": 1,
+            "p. coradel": 13,
+            "a. s. frigout": 35,
+            "e. quenard": 38,
+            "a. robinet": 30,
+            "s. mura": 3,
+            "s. lang": 10
         }
     },
     {
@@ -716,13 +716,13 @@
         "blancs": 4,
         "exprimé": 227,
         "candidats": {
-            "rose": 4,
-            "coradel": 25,
-            "frigout": 58,
-            "quenard": 53,
-            "robinet": 59,
-            "mura": 14,
-            "lang": 14
+            "t. rose": 4,
+            "p. coradel": 25,
+            "a. s. frigout": 58,
+            "e. quenard": 53,
+            "a. robinet": 59,
+            "s. mura": 14,
+            "s. lang": 14
         }
     },
     {
@@ -738,13 +738,13 @@
         "blancs": 3,
         "exprimé": 326,
         "candidats": {
-            "rose": 12,
-            "coradel": 31,
-            "frigout": 102,
-            "quenard": 43,
-            "robinet": 109,
-            "mura": 8,
-            "lang": 21
+            "t. rose": 12,
+            "p. coradel": 31,
+            "a. s. frigout": 102,
+            "e. quenard": 43,
+            "a. robinet": 109,
+            "s. mura": 8,
+            "s. lang": 21
         }
     },
     {
@@ -760,13 +760,13 @@
         "blancs": 0,
         "exprimé": 293,
         "candidats": {
-            "rose": 10,
-            "coradel": 18,
-            "frigout": 93,
-            "quenard": 40,
-            "robinet": 108,
-            "mura": 5,
-            "lang": 19
+            "t. rose": 10,
+            "p. coradel": 18,
+            "a. s. frigout": 93,
+            "e. quenard": 40,
+            "a. robinet": 108,
+            "s. mura": 5,
+            "s. lang": 19
         }
     },
     {
@@ -782,13 +782,13 @@
         "blancs": 2,
         "exprimé": 209,
         "candidats": {
-            "rose": 5,
-            "coradel": 16,
-            "frigout": 52,
-            "quenard": 53,
-            "robinet": 55,
-            "mura": 14,
-            "lang": 14
+            "t. rose": 5,
+            "p. coradel": 16,
+            "a. s. frigout": 52,
+            "e. quenard": 53,
+            "a. robinet": 55,
+            "s. mura": 14,
+            "s. lang": 14
         }
     },
     {
@@ -804,13 +804,13 @@
         "blancs": 3,
         "exprimé": 298,
         "candidats": {
-            "rose": 8,
-            "coradel": 40,
-            "frigout": 88,
-            "quenard": 57,
-            "robinet": 72,
-            "mura": 21,
-            "lang": 12
+            "t. rose": 8,
+            "p. coradel": 40,
+            "a. s. frigout": 88,
+            "e. quenard": 57,
+            "a. robinet": 72,
+            "s. mura": 21,
+            "s. lang": 12
         }
     },
     {
@@ -826,13 +826,13 @@
         "blancs": 2,
         "exprimé": 298,
         "candidats": {
-            "rose": 5,
-            "coradel": 32,
-            "frigout": 71,
-            "quenard": 73,
-            "robinet": 86,
-            "mura": 10,
-            "lang": 21
+            "t. rose": 5,
+            "p. coradel": 32,
+            "a. s. frigout": 71,
+            "e. quenard": 73,
+            "a. robinet": 86,
+            "s. mura": 10,
+            "s. lang": 21
         }
     },
     {
@@ -848,13 +848,13 @@
         "blancs": 1,
         "exprimé": 116,
         "candidats": {
-            "rose": 1,
-            "coradel": 20,
-            "frigout": 29,
-            "quenard": 17,
-            "robinet": 33,
-            "mura": 7,
-            "lang": 9
+            "t. rose": 1,
+            "p. coradel": 20,
+            "a. s. frigout": 29,
+            "e. quenard": 17,
+            "a. robinet": 33,
+            "s. mura": 7,
+            "s. lang": 9
         }
     },
     {
@@ -870,13 +870,13 @@
         "blancs": 2,
         "exprimé": 322,
         "candidats": {
-            "rose": 7,
-            "coradel": 25,
-            "frigout": 99,
-            "quenard": 46,
-            "robinet": 118,
-            "mura": 8,
-            "lang": 19
+            "t. rose": 7,
+            "p. coradel": 25,
+            "a. s. frigout": 99,
+            "e. quenard": 46,
+            "a. robinet": 118,
+            "s. mura": 8,
+            "s. lang": 19
         }
     },
     {
@@ -892,13 +892,13 @@
         "blancs": 6,
         "exprimé": 521,
         "candidats": {
-            "rose": 2,
-            "coradel": 30,
-            "frigout": 53,
-            "quenard": 86,
-            "robinet": 307,
-            "mura": 1,
-            "lang": 42
+            "t. rose": 2,
+            "p. coradel": 30,
+            "a. s. frigout": 53,
+            "e. quenard": 86,
+            "a. robinet": 307,
+            "s. mura": 1,
+            "s. lang": 42
         }
     },
     {
@@ -914,13 +914,13 @@
         "blancs": 7,
         "exprimé": 539,
         "candidats": {
-            "rose": 3,
-            "coradel": 25,
-            "frigout": 66,
-            "quenard": 72,
-            "robinet": 308,
-            "mura": 2,
-            "lang": 63
+            "t. rose": 3,
+            "p. coradel": 25,
+            "a. s. frigout": 66,
+            "e. quenard": 72,
+            "a. robinet": 308,
+            "s. mura": 2,
+            "s. lang": 63
         }
     },
     {
@@ -936,13 +936,13 @@
         "blancs": 3,
         "exprimé": 630,
         "candidats": {
-            "rose": 3,
-            "coradel": 37,
-            "frigout": 76,
-            "quenard": 121,
-            "robinet": 346,
-            "mura": 5,
-            "lang": 42
+            "t. rose": 3,
+            "p. coradel": 37,
+            "a. s. frigout": 76,
+            "e. quenard": 121,
+            "a. robinet": 346,
+            "s. mura": 5,
+            "s. lang": 42
         }
     },
     {
@@ -958,13 +958,13 @@
         "blancs": 2,
         "exprimé": 414,
         "candidats": {
-            "rose": 9,
-            "coradel": 37,
-            "frigout": 93,
-            "quenard": 90,
-            "robinet": 140,
-            "mura": 5,
-            "lang": 40
+            "t. rose": 9,
+            "p. coradel": 37,
+            "a. s. frigout": 93,
+            "e. quenard": 90,
+            "a. robinet": 140,
+            "s. mura": 5,
+            "s. lang": 40
         }
     },
     {
@@ -980,13 +980,13 @@
         "blancs": 5,
         "exprimé": 487,
         "candidats": {
-            "rose": 3,
-            "coradel": 32,
-            "frigout": 94,
-            "quenard": 107,
-            "robinet": 207,
-            "mura": 3,
-            "lang": 41
+            "t. rose": 3,
+            "p. coradel": 32,
+            "a. s. frigout": 94,
+            "e. quenard": 107,
+            "a. robinet": 207,
+            "s. mura": 3,
+            "s. lang": 41
         }
     },
     {
@@ -1002,13 +1002,13 @@
         "blancs": 5,
         "exprimé": 488,
         "candidats": {
-            "rose": 7,
-            "coradel": 32,
-            "frigout": 89,
-            "quenard": 122,
-            "robinet": 195,
-            "mura": 2,
-            "lang": 41
+            "t. rose": 7,
+            "p. coradel": 32,
+            "a. s. frigout": 89,
+            "e. quenard": 122,
+            "a. robinet": 195,
+            "s. mura": 2,
+            "s. lang": 41
         }
     },
     {
@@ -1024,13 +1024,13 @@
         "blancs": 4,
         "exprimé": 536,
         "candidats": {
-            "rose": 12,
-            "coradel": 35,
-            "frigout": 106,
-            "quenard": 104,
-            "robinet": 238,
-            "mura": 5,
-            "lang": 36
+            "t. rose": 12,
+            "p. coradel": 35,
+            "a. s. frigout": 106,
+            "e. quenard": 104,
+            "a. robinet": 238,
+            "s. mura": 5,
+            "s. lang": 36
         }
     },
     {
@@ -1046,13 +1046,13 @@
         "blancs": 2,
         "exprimé": 468,
         "candidats": {
-            "rose": 12,
-            "coradel": 37,
-            "frigout": 102,
-            "quenard": 91,
-            "robinet": 192,
-            "mura": 7,
-            "lang": 27
+            "t. rose": 12,
+            "p. coradel": 37,
+            "a. s. frigout": 102,
+            "e. quenard": 91,
+            "a. robinet": 192,
+            "s. mura": 7,
+            "s. lang": 27
         }
     },
     {
@@ -1068,13 +1068,13 @@
         "blancs": 2,
         "exprimé": 353,
         "candidats": {
-            "rose": 13,
-            "coradel": 27,
-            "frigout": 113,
-            "quenard": 36,
-            "robinet": 147,
-            "mura": 2,
-            "lang": 15
+            "t. rose": 13,
+            "p. coradel": 27,
+            "a. s. frigout": 113,
+            "e. quenard": 36,
+            "a. robinet": 147,
+            "s. mura": 2,
+            "s. lang": 15
         }
     },
     {
@@ -1090,13 +1090,13 @@
         "blancs": 6,
         "exprimé": 271,
         "candidats": {
-            "rose": 8,
-            "coradel": 28,
-            "frigout": 45,
-            "quenard": 32,
-            "robinet": 139,
-            "mura": 2,
-            "lang": 17
+            "t. rose": 8,
+            "p. coradel": 28,
+            "a. s. frigout": 45,
+            "e. quenard": 32,
+            "a. robinet": 139,
+            "s. mura": 2,
+            "s. lang": 17
         }
     },
     {
@@ -1112,13 +1112,13 @@
         "blancs": 5,
         "exprimé": 245,
         "candidats": {
-            "rose": 3,
-            "coradel": 44,
-            "frigout": 62,
-            "quenard": 42,
-            "robinet": 72,
-            "mura": 11,
-            "lang": 11
+            "t. rose": 3,
+            "p. coradel": 44,
+            "a. s. frigout": 62,
+            "e. quenard": 42,
+            "a. robinet": 72,
+            "s. mura": 11,
+            "s. lang": 11
         }
     },
     {
@@ -1134,13 +1134,13 @@
         "blancs": 3,
         "exprimé": 309,
         "candidats": {
-            "rose": 5,
-            "coradel": 49,
-            "frigout": 66,
-            "quenard": 43,
-            "robinet": 120,
-            "mura": 2,
-            "lang": 24
+            "t. rose": 5,
+            "p. coradel": 49,
+            "a. s. frigout": 66,
+            "e. quenard": 43,
+            "a. robinet": 120,
+            "s. mura": 2,
+            "s. lang": 24
         }
     },
     {
@@ -1156,13 +1156,13 @@
         "blancs": 0,
         "exprimé": 225,
         "candidats": {
-            "rose": 8,
-            "coradel": 22,
-            "frigout": 57,
-            "quenard": 21,
-            "robinet": 95,
-            "mura": 5,
-            "lang": 17
+            "t. rose": 8,
+            "p. coradel": 22,
+            "a. s. frigout": 57,
+            "e. quenard": 21,
+            "a. robinet": 95,
+            "s. mura": 5,
+            "s. lang": 17
         }
     },
     {
@@ -1178,13 +1178,13 @@
         "blancs": 2,
         "exprimé": 274,
         "candidats": {
-            "rose": 7,
-            "coradel": 13,
-            "frigout": 79,
-            "quenard": 37,
-            "robinet": 118,
-            "mura": 1,
-            "lang": 19
+            "t. rose": 7,
+            "p. coradel": 13,
+            "a. s. frigout": 79,
+            "e. quenard": 37,
+            "a. robinet": 118,
+            "s. mura": 1,
+            "s. lang": 19
         }
     },
     {
@@ -1200,13 +1200,13 @@
         "blancs": 2,
         "exprimé": 345,
         "candidats": {
-            "rose": 5,
-            "coradel": 10,
-            "frigout": 99,
-            "quenard": 60,
-            "robinet": 147,
-            "mura": 3,
-            "lang": 21
+            "t. rose": 5,
+            "p. coradel": 10,
+            "a. s. frigout": 99,
+            "e. quenard": 60,
+            "a. robinet": 147,
+            "s. mura": 3,
+            "s. lang": 21
         }
     },
     {
@@ -1222,13 +1222,13 @@
         "blancs": 2,
         "exprimé": 277,
         "candidats": {
-            "rose": 5,
-            "coradel": 26,
-            "frigout": 72,
-            "quenard": 45,
-            "robinet": 102,
-            "mura": 2,
-            "lang": 25
+            "t. rose": 5,
+            "p. coradel": 26,
+            "a. s. frigout": 72,
+            "e. quenard": 45,
+            "a. robinet": 102,
+            "s. mura": 2,
+            "s. lang": 25
         }
     },
     {
@@ -1244,13 +1244,13 @@
         "blancs": 4,
         "exprimé": 447,
         "candidats": {
-            "rose": 11,
-            "coradel": 21,
-            "frigout": 131,
-            "quenard": 77,
-            "robinet": 176,
-            "mura": 3,
-            "lang": 28
+            "t. rose": 11,
+            "p. coradel": 21,
+            "a. s. frigout": 131,
+            "e. quenard": 77,
+            "a. robinet": 176,
+            "s. mura": 3,
+            "s. lang": 28
         }
     },
     {
@@ -1266,13 +1266,13 @@
         "blancs": 1,
         "exprimé": 398,
         "candidats": {
-            "rose": 8,
-            "coradel": 35,
-            "frigout": 98,
-            "quenard": 67,
-            "robinet": 163,
-            "mura": 1,
-            "lang": 26
+            "t. rose": 8,
+            "p. coradel": 35,
+            "a. s. frigout": 98,
+            "e. quenard": 67,
+            "a. robinet": 163,
+            "s. mura": 1,
+            "s. lang": 26
         }
     },
     {
@@ -1288,13 +1288,13 @@
         "blancs": 9,
         "exprimé": 493,
         "candidats": {
-            "rose": 14,
-            "coradel": 24,
-            "frigout": 113,
-            "quenard": 76,
-            "robinet": 228,
-            "mura": 3,
-            "lang": 35
+            "t. rose": 14,
+            "p. coradel": 24,
+            "a. s. frigout": 113,
+            "e. quenard": 76,
+            "a. robinet": 228,
+            "s. mura": 3,
+            "s. lang": 35
         }
     },
     {
@@ -1310,13 +1310,13 @@
         "blancs": 4,
         "exprimé": 634,
         "candidats": {
-            "rose": 15,
-            "coradel": 42,
-            "frigout": 113,
-            "quenard": 113,
-            "robinet": 304,
-            "mura": 6,
-            "lang": 41
+            "t. rose": 15,
+            "p. coradel": 42,
+            "a. s. frigout": 113,
+            "e. quenard": 113,
+            "a. robinet": 304,
+            "s. mura": 6,
+            "s. lang": 41
         }
     },
     {
@@ -1332,13 +1332,13 @@
         "blancs": 3,
         "exprimé": 427,
         "candidats": {
-            "rose": 12,
-            "coradel": 25,
-            "frigout": 98,
-            "quenard": 71,
-            "robinet": 182,
-            "mura": 5,
-            "lang": 34
+            "t. rose": 12,
+            "p. coradel": 25,
+            "a. s. frigout": 98,
+            "e. quenard": 71,
+            "a. robinet": 182,
+            "s. mura": 5,
+            "s. lang": 34
         }
     },
     {
@@ -1354,13 +1354,13 @@
         "blancs": 5,
         "exprimé": 617,
         "candidats": {
-            "rose": 6,
-            "coradel": 28,
-            "frigout": 118,
-            "quenard": 133,
-            "robinet": 282,
-            "mura": 4,
-            "lang": 46
+            "t. rose": 6,
+            "p. coradel": 28,
+            "a. s. frigout": 118,
+            "e. quenard": 133,
+            "a. robinet": 282,
+            "s. mura": 4,
+            "s. lang": 46
         }
     },
     {
@@ -1376,13 +1376,13 @@
         "blancs": 0,
         "exprimé": 469,
         "candidats": {
-            "rose": 2,
-            "coradel": 38,
-            "frigout": 106,
-            "quenard": 102,
-            "robinet": 190,
-            "mura": 1,
-            "lang": 30
+            "t. rose": 2,
+            "p. coradel": 38,
+            "a. s. frigout": 106,
+            "e. quenard": 102,
+            "a. robinet": 190,
+            "s. mura": 1,
+            "s. lang": 30
         }
     },
     {
@@ -1398,13 +1398,13 @@
         "blancs": 7,
         "exprimé": 587,
         "candidats": {
-            "rose": 9,
-            "coradel": 39,
-            "frigout": 121,
-            "quenard": 91,
-            "robinet": 273,
-            "mura": 1,
-            "lang": 53
+            "t. rose": 9,
+            "p. coradel": 39,
+            "a. s. frigout": 121,
+            "e. quenard": 91,
+            "a. robinet": 273,
+            "s. mura": 1,
+            "s. lang": 53
         }
     },
     {
@@ -1420,13 +1420,13 @@
         "blancs": 5,
         "exprimé": 557,
         "candidats": {
-            "rose": 10,
-            "coradel": 73,
-            "frigout": 87,
-            "quenard": 114,
-            "robinet": 239,
-            "mura": 5,
-            "lang": 29
+            "t. rose": 10,
+            "p. coradel": 73,
+            "a. s. frigout": 87,
+            "e. quenard": 114,
+            "a. robinet": 239,
+            "s. mura": 5,
+            "s. lang": 29
         }
     },
     {
@@ -1442,13 +1442,13 @@
         "blancs": 3,
         "exprimé": 482,
         "candidats": {
-            "rose": 9,
-            "coradel": 33,
-            "frigout": 76,
-            "quenard": 91,
-            "robinet": 231,
-            "mura": 6,
-            "lang": 36
+            "t. rose": 9,
+            "p. coradel": 33,
+            "a. s. frigout": 76,
+            "e. quenard": 91,
+            "a. robinet": 231,
+            "s. mura": 6,
+            "s. lang": 36
         }
     },
     {
@@ -1464,13 +1464,13 @@
         "blancs": 5,
         "exprimé": 620,
         "candidats": {
-            "rose": 13,
-            "coradel": 54,
-            "frigout": 112,
-            "quenard": 118,
-            "robinet": 282,
-            "mura": 5,
-            "lang": 36
+            "t. rose": 13,
+            "p. coradel": 54,
+            "a. s. frigout": 112,
+            "e. quenard": 118,
+            "a. robinet": 282,
+            "s. mura": 5,
+            "s. lang": 36
         }
     },
     {
@@ -1486,13 +1486,13 @@
         "blancs": 9,
         "exprimé": 471,
         "candidats": {
-            "rose": 3,
-            "coradel": 25,
-            "frigout": 105,
-            "quenard": 106,
-            "robinet": 208,
-            "mura": 5,
-            "lang": 19
+            "t. rose": 3,
+            "p. coradel": 25,
+            "a. s. frigout": 105,
+            "e. quenard": 106,
+            "a. robinet": 208,
+            "s. mura": 5,
+            "s. lang": 19
         }
     },
     {
@@ -1508,13 +1508,13 @@
         "blancs": 4,
         "exprimé": 683,
         "candidats": {
-            "rose": 11,
-            "coradel": 72,
-            "frigout": 151,
-            "quenard": 126,
-            "robinet": 297,
-            "mura": 7,
-            "lang": 19
+            "t. rose": 11,
+            "p. coradel": 72,
+            "a. s. frigout": 151,
+            "e. quenard": 126,
+            "a. robinet": 297,
+            "s. mura": 7,
+            "s. lang": 19
         }
     },
     {
@@ -1530,13 +1530,13 @@
         "blancs": 7,
         "exprimé": 479,
         "candidats": {
-            "rose": 6,
-            "coradel": 29,
-            "frigout": 76,
-            "quenard": 99,
-            "robinet": 249,
-            "mura": 1,
-            "lang": 19
+            "t. rose": 6,
+            "p. coradel": 29,
+            "a. s. frigout": 76,
+            "e. quenard": 99,
+            "a. robinet": 249,
+            "s. mura": 1,
+            "s. lang": 19
         }
     },
     {
@@ -1552,13 +1552,13 @@
         "blancs": 2,
         "exprimé": 470,
         "candidats": {
-            "rose": 6,
-            "coradel": 42,
-            "frigout": 54,
-            "quenard": 113,
-            "robinet": 223,
-            "mura": 4,
-            "lang": 28
+            "t. rose": 6,
+            "p. coradel": 42,
+            "a. s. frigout": 54,
+            "e. quenard": 113,
+            "a. robinet": 223,
+            "s. mura": 4,
+            "s. lang": 28
         }
     },
     {
@@ -1574,13 +1574,13 @@
         "blancs": 6,
         "exprimé": 488,
         "candidats": {
-            "rose": 7,
-            "coradel": 45,
-            "frigout": 81,
-            "quenard": 95,
-            "robinet": 238,
-            "mura": 0,
-            "lang": 22
+            "t. rose": 7,
+            "p. coradel": 45,
+            "a. s. frigout": 81,
+            "e. quenard": 95,
+            "a. robinet": 238,
+            "s. mura": 0,
+            "s. lang": 22
         }
     },
     {
@@ -1596,13 +1596,13 @@
         "blancs": 5,
         "exprimé": 522,
         "candidats": {
-            "rose": 9,
-            "coradel": 27,
-            "frigout": 110,
-            "quenard": 95,
-            "robinet": 235,
-            "mura": 1,
-            "lang": 45
+            "t. rose": 9,
+            "p. coradel": 27,
+            "a. s. frigout": 110,
+            "e. quenard": 95,
+            "a. robinet": 235,
+            "s. mura": 1,
+            "s. lang": 45
         }
     },
     {
@@ -1618,13 +1618,13 @@
         "blancs": 5,
         "exprimé": 381,
         "candidats": {
-            "rose": 3,
-            "coradel": 22,
-            "frigout": 69,
-            "quenard": 92,
-            "robinet": 175,
-            "mura": 1,
-            "lang": 19
+            "t. rose": 3,
+            "p. coradel": 22,
+            "a. s. frigout": 69,
+            "e. quenard": 92,
+            "a. robinet": 175,
+            "s. mura": 1,
+            "s. lang": 19
         }
     },
     {
@@ -1640,13 +1640,13 @@
         "blancs": 3,
         "exprimé": 572,
         "candidats": {
-            "rose": 15,
-            "coradel": 27,
-            "frigout": 105,
-            "quenard": 101,
-            "robinet": 276,
-            "mura": 5,
-            "lang": 43
+            "t. rose": 15,
+            "p. coradel": 27,
+            "a. s. frigout": 105,
+            "e. quenard": 101,
+            "a. robinet": 276,
+            "s. mura": 5,
+            "s. lang": 43
         }
     },
     {
@@ -1662,13 +1662,13 @@
         "blancs": 1,
         "exprimé": 392,
         "candidats": {
-            "rose": 6,
-            "coradel": 28,
-            "frigout": 66,
-            "quenard": 95,
-            "robinet": 165,
-            "mura": 0,
-            "lang": 32
+            "t. rose": 6,
+            "p. coradel": 28,
+            "a. s. frigout": 66,
+            "e. quenard": 95,
+            "a. robinet": 165,
+            "s. mura": 0,
+            "s. lang": 32
         }
     },
     {
@@ -1684,13 +1684,13 @@
         "blancs": 1,
         "exprimé": 547,
         "candidats": {
-            "rose": 9,
-            "coradel": 34,
-            "frigout": 185,
-            "quenard": 77,
-            "robinet": 203,
-            "mura": 0,
-            "lang": 39
+            "t. rose": 9,
+            "p. coradel": 34,
+            "a. s. frigout": 185,
+            "e. quenard": 77,
+            "a. robinet": 203,
+            "s. mura": 0,
+            "s. lang": 39
         }
     },
     {
@@ -1706,13 +1706,13 @@
         "blancs": 4,
         "exprimé": 181,
         "candidats": {
-            "rose": 5,
-            "coradel": 20,
-            "frigout": 39,
-            "quenard": 17,
-            "robinet": 91,
-            "mura": 3,
-            "lang": 6
+            "t. rose": 5,
+            "p. coradel": 20,
+            "a. s. frigout": 39,
+            "e. quenard": 17,
+            "a. robinet": 91,
+            "s. mura": 3,
+            "s. lang": 6
         }
     },
     {
@@ -1728,13 +1728,13 @@
         "blancs": 2,
         "exprimé": 309,
         "candidats": {
-            "rose": 4,
-            "coradel": 32,
-            "frigout": 84,
-            "quenard": 43,
-            "robinet": 118,
-            "mura": 4,
-            "lang": 24
+            "t. rose": 4,
+            "p. coradel": 32,
+            "a. s. frigout": 84,
+            "e. quenard": 43,
+            "a. robinet": 118,
+            "s. mura": 4,
+            "s. lang": 24
         }
     },
     {
@@ -1750,13 +1750,13 @@
         "blancs": 8,
         "exprimé": 499,
         "candidats": {
-            "rose": 15,
-            "coradel": 30,
-            "frigout": 81,
-            "quenard": 107,
-            "robinet": 221,
-            "mura": 2,
-            "lang": 43
+            "t. rose": 15,
+            "p. coradel": 30,
+            "a. s. frigout": 81,
+            "e. quenard": 107,
+            "a. robinet": 221,
+            "s. mura": 2,
+            "s. lang": 43
         }
     },
     {
@@ -1772,13 +1772,13 @@
         "blancs": 1,
         "exprimé": 435,
         "candidats": {
-            "rose": 14,
-            "coradel": 29,
-            "frigout": 114,
-            "quenard": 72,
-            "robinet": 174,
-            "mura": 2,
-            "lang": 30
+            "t. rose": 14,
+            "p. coradel": 29,
+            "a. s. frigout": 114,
+            "e. quenard": 72,
+            "a. robinet": 174,
+            "s. mura": 2,
+            "s. lang": 30
         }
     },
     {
@@ -1794,13 +1794,13 @@
         "blancs": 4,
         "exprimé": 401,
         "candidats": {
-            "rose": 7,
-            "coradel": 32,
-            "frigout": 115,
-            "quenard": 72,
-            "robinet": 143,
-            "mura": 1,
-            "lang": 31
+            "t. rose": 7,
+            "p. coradel": 32,
+            "a. s. frigout": 115,
+            "e. quenard": 72,
+            "a. robinet": 143,
+            "s. mura": 1,
+            "s. lang": 31
         }
     },
     {
@@ -1816,13 +1816,13 @@
         "blancs": 4,
         "exprimé": 475,
         "candidats": {
-            "rose": 8,
-            "coradel": 42,
-            "frigout": 156,
-            "quenard": 57,
-            "robinet": 163,
-            "mura": 2,
-            "lang": 47
+            "t. rose": 8,
+            "p. coradel": 42,
+            "a. s. frigout": 156,
+            "e. quenard": 57,
+            "a. robinet": 163,
+            "s. mura": 2,
+            "s. lang": 47
         }
     },
     {
@@ -1838,13 +1838,13 @@
         "blancs": 6,
         "exprimé": 553,
         "candidats": {
-            "rose": 12,
-            "coradel": 24,
-            "frigout": 126,
-            "quenard": 122,
-            "robinet": 221,
-            "mura": 1,
-            "lang": 47
+            "t. rose": 12,
+            "p. coradel": 24,
+            "a. s. frigout": 126,
+            "e. quenard": 122,
+            "a. robinet": 221,
+            "s. mura": 1,
+            "s. lang": 47
         }
     },
     {
@@ -1860,13 +1860,13 @@
         "blancs": 3,
         "exprimé": 447,
         "candidats": {
-            "rose": 8,
-            "coradel": 44,
-            "frigout": 80,
-            "quenard": 87,
-            "robinet": 187,
-            "mura": 2,
-            "lang": 39
+            "t. rose": 8,
+            "p. coradel": 44,
+            "a. s. frigout": 80,
+            "e. quenard": 87,
+            "a. robinet": 187,
+            "s. mura": 2,
+            "s. lang": 39
         }
     },
     {
@@ -1882,13 +1882,13 @@
         "blancs": 2,
         "exprimé": 435,
         "candidats": {
-            "rose": 6,
-            "coradel": 38,
-            "frigout": 136,
-            "quenard": 56,
-            "robinet": 157,
-            "mura": 4,
-            "lang": 38
+            "t. rose": 6,
+            "p. coradel": 38,
+            "a. s. frigout": 136,
+            "e. quenard": 56,
+            "a. robinet": 157,
+            "s. mura": 4,
+            "s. lang": 38
         }
     },
     {
@@ -1904,13 +1904,13 @@
         "blancs": 7,
         "exprimé": 374,
         "candidats": {
-            "rose": 10,
-            "coradel": 21,
-            "frigout": 150,
-            "quenard": 39,
-            "robinet": 137,
-            "mura": 3,
-            "lang": 14
+            "t. rose": 10,
+            "p. coradel": 21,
+            "a. s. frigout": 150,
+            "e. quenard": 39,
+            "a. robinet": 137,
+            "s. mura": 3,
+            "s. lang": 14
         }
     },
     {
@@ -1926,13 +1926,13 @@
         "blancs": 1,
         "exprimé": 418,
         "candidats": {
-            "rose": 10,
-            "coradel": 25,
-            "frigout": 131,
-            "quenard": 69,
-            "robinet": 139,
-            "mura": 3,
-            "lang": 41
+            "t. rose": 10,
+            "p. coradel": 25,
+            "a. s. frigout": 131,
+            "e. quenard": 69,
+            "a. robinet": 139,
+            "s. mura": 3,
+            "s. lang": 41
         }
     },
     {
@@ -1948,13 +1948,13 @@
         "blancs": 5,
         "exprimé": 197,
         "candidats": {
-            "rose": 3,
-            "coradel": 13,
-            "frigout": 60,
-            "quenard": 27,
-            "robinet": 78,
-            "mura": 7,
-            "lang": 9
+            "t. rose": 3,
+            "p. coradel": 13,
+            "a. s. frigout": 60,
+            "e. quenard": 27,
+            "a. robinet": 78,
+            "s. mura": 7,
+            "s. lang": 9
         }
     },
     {
@@ -1970,13 +1970,13 @@
         "blancs": 1,
         "exprimé": 230,
         "candidats": {
-            "rose": 4,
-            "coradel": 22,
-            "frigout": 74,
-            "quenard": 26,
-            "robinet": 75,
-            "mura": 10,
-            "lang": 19
+            "t. rose": 4,
+            "p. coradel": 22,
+            "a. s. frigout": 74,
+            "e. quenard": 26,
+            "a. robinet": 75,
+            "s. mura": 10,
+            "s. lang": 19
         }
     },
     {
@@ -1992,13 +1992,13 @@
         "blancs": 5,
         "exprimé": 343,
         "candidats": {
-            "rose": 3,
-            "coradel": 31,
-            "frigout": 105,
-            "quenard": 55,
-            "robinet": 115,
-            "mura": 16,
-            "lang": 18
+            "t. rose": 3,
+            "p. coradel": 31,
+            "a. s. frigout": 105,
+            "e. quenard": 55,
+            "a. robinet": 115,
+            "s. mura": 16,
+            "s. lang": 18
         }
     },
     {
@@ -2014,13 +2014,13 @@
         "blancs": 2,
         "exprimé": 257,
         "candidats": {
-            "rose": 3,
-            "coradel": 20,
-            "frigout": 79,
-            "quenard": 27,
-            "robinet": 101,
-            "mura": 9,
-            "lang": 18
+            "t. rose": 3,
+            "p. coradel": 20,
+            "a. s. frigout": 79,
+            "e. quenard": 27,
+            "a. robinet": 101,
+            "s. mura": 9,
+            "s. lang": 18
         }
     },
     {
@@ -2036,13 +2036,13 @@
         "blancs": 7,
         "exprimé": 397,
         "candidats": {
-            "rose": 6,
-            "coradel": 30,
-            "frigout": 102,
-            "quenard": 75,
-            "robinet": 153,
-            "mura": 10,
-            "lang": 21
+            "t. rose": 6,
+            "p. coradel": 30,
+            "a. s. frigout": 102,
+            "e. quenard": 75,
+            "a. robinet": 153,
+            "s. mura": 10,
+            "s. lang": 21
         }
     },
     {
@@ -2058,13 +2058,13 @@
         "blancs": 8,
         "exprimé": 412,
         "candidats": {
-            "rose": 10,
-            "coradel": 50,
-            "frigout": 112,
-            "quenard": 76,
-            "robinet": 126,
-            "mura": 11,
-            "lang": 27
+            "t. rose": 10,
+            "p. coradel": 50,
+            "a. s. frigout": 112,
+            "e. quenard": 76,
+            "a. robinet": 126,
+            "s. mura": 11,
+            "s. lang": 27
         }
     },
     {
@@ -2080,13 +2080,13 @@
         "blancs": 6,
         "exprimé": 428,
         "candidats": {
-            "rose": 9,
-            "coradel": 42,
-            "frigout": 65,
-            "quenard": 80,
-            "robinet": 196,
-            "mura": 3,
-            "lang": 33
+            "t. rose": 9,
+            "p. coradel": 42,
+            "a. s. frigout": 65,
+            "e. quenard": 80,
+            "a. robinet": 196,
+            "s. mura": 3,
+            "s. lang": 33
         }
     },
     {
@@ -2102,13 +2102,13 @@
         "blancs": 4,
         "exprimé": 389,
         "candidats": {
-            "rose": 3,
-            "coradel": 31,
-            "frigout": 79,
-            "quenard": 88,
-            "robinet": 158,
-            "mura": 5,
-            "lang": 25
+            "t. rose": 3,
+            "p. coradel": 31,
+            "a. s. frigout": 79,
+            "e. quenard": 88,
+            "a. robinet": 158,
+            "s. mura": 5,
+            "s. lang": 25
         }
     },
     {
@@ -2124,13 +2124,13 @@
         "blancs": 8,
         "exprimé": 507,
         "candidats": {
-            "rose": 9,
-            "coradel": 29,
-            "frigout": 69,
-            "quenard": 101,
-            "robinet": 238,
-            "mura": 4,
-            "lang": 57
+            "t. rose": 9,
+            "p. coradel": 29,
+            "a. s. frigout": 69,
+            "e. quenard": 101,
+            "a. robinet": 238,
+            "s. mura": 4,
+            "s. lang": 57
         }
     },
     {
@@ -2146,13 +2146,13 @@
         "blancs": 12,
         "exprimé": 340,
         "candidats": {
-            "rose": 4,
-            "coradel": 15,
-            "frigout": 70,
-            "quenard": 60,
-            "robinet": 154,
-            "mura": 5,
-            "lang": 32
+            "t. rose": 4,
+            "p. coradel": 15,
+            "a. s. frigout": 70,
+            "e. quenard": 60,
+            "a. robinet": 154,
+            "s. mura": 5,
+            "s. lang": 32
         }
     },
     {
@@ -2168,13 +2168,13 @@
         "blancs": 5,
         "exprimé": 418,
         "candidats": {
-            "rose": 0,
-            "coradel": 20,
-            "frigout": 66,
-            "quenard": 85,
-            "robinet": 211,
-            "mura": 3,
-            "lang": 33
+            "t. rose": 0,
+            "p. coradel": 20,
+            "a. s. frigout": 66,
+            "e. quenard": 85,
+            "a. robinet": 211,
+            "s. mura": 3,
+            "s. lang": 33
         }
     },
     {
@@ -2190,13 +2190,13 @@
         "blancs": 2,
         "exprimé": 486,
         "candidats": {
-            "rose": 4,
-            "coradel": 38,
-            "frigout": 90,
-            "quenard": 101,
-            "robinet": 207,
-            "mura": 3,
-            "lang": 43
+            "t. rose": 4,
+            "p. coradel": 38,
+            "a. s. frigout": 90,
+            "e. quenard": 101,
+            "a. robinet": 207,
+            "s. mura": 3,
+            "s. lang": 43
         }
     },
     {
@@ -2212,13 +2212,13 @@
         "blancs": 2,
         "exprimé": 417,
         "candidats": {
-            "rose": 7,
-            "coradel": 31,
-            "frigout": 58,
-            "quenard": 82,
-            "robinet": 195,
-            "mura": 3,
-            "lang": 41
+            "t. rose": 7,
+            "p. coradel": 31,
+            "a. s. frigout": 58,
+            "e. quenard": 82,
+            "a. robinet": 195,
+            "s. mura": 3,
+            "s. lang": 41
         }
     },
     {
@@ -2234,13 +2234,13 @@
         "blancs": 10,
         "exprimé": 475,
         "candidats": {
-            "rose": 9,
-            "coradel": 17,
-            "frigout": 151,
-            "quenard": 66,
-            "robinet": 184,
-            "mura": 8,
-            "lang": 40
+            "t. rose": 9,
+            "p. coradel": 17,
+            "a. s. frigout": 151,
+            "e. quenard": 66,
+            "a. robinet": 184,
+            "s. mura": 8,
+            "s. lang": 40
         }
     },
     {
@@ -2256,13 +2256,13 @@
         "blancs": 0,
         "exprimé": 376,
         "candidats": {
-            "rose": 6,
-            "coradel": 21,
-            "frigout": 171,
-            "quenard": 42,
-            "robinet": 113,
-            "mura": 1,
-            "lang": 22
+            "t. rose": 6,
+            "p. coradel": 21,
+            "a. s. frigout": 171,
+            "e. quenard": 42,
+            "a. robinet": 113,
+            "s. mura": 1,
+            "s. lang": 22
         }
     },
     {
@@ -2278,13 +2278,13 @@
         "blancs": 3,
         "exprimé": 434,
         "candidats": {
-            "rose": 6,
-            "coradel": 28,
-            "frigout": 116,
-            "quenard": 94,
-            "robinet": 156,
-            "mura": 2,
-            "lang": 32
+            "t. rose": 6,
+            "p. coradel": 28,
+            "a. s. frigout": 116,
+            "e. quenard": 94,
+            "a. robinet": 156,
+            "s. mura": 2,
+            "s. lang": 32
         }
     },
     {
@@ -2300,13 +2300,13 @@
         "blancs": 2,
         "exprimé": 403,
         "candidats": {
-            "rose": 7,
-            "coradel": 22,
-            "frigout": 137,
-            "quenard": 58,
-            "robinet": 145,
-            "mura": 4,
-            "lang": 30
+            "t. rose": 7,
+            "p. coradel": 22,
+            "a. s. frigout": 137,
+            "e. quenard": 58,
+            "a. robinet": 145,
+            "s. mura": 4,
+            "s. lang": 30
         }
     },
     {
@@ -2322,13 +2322,13 @@
         "blancs": 9,
         "exprimé": 264,
         "candidats": {
-            "rose": 3,
-            "coradel": 6,
-            "frigout": 80,
-            "quenard": 27,
-            "robinet": 133,
-            "mura": 1,
-            "lang": 14
+            "t. rose": 3,
+            "p. coradel": 6,
+            "a. s. frigout": 80,
+            "e. quenard": 27,
+            "a. robinet": 133,
+            "s. mura": 1,
+            "s. lang": 14
         }
     }
 ]
