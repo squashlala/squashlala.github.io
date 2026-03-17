@@ -12,5 +12,19 @@
             "D. Potier": 205,
             "J. Sépa": 0
         }
+    },
+    {
+        "bureau": "02", 
+        "coordonnees": [49.521076, 4.474539],
+        "nom": "Annexe mairie - Données non réelles",
+        "inscrits": 0,
+        "votants": 0,
+        "nuls": 0,
+        "blancs": 0,
+        "exprimé": 0,
+        "candidats": {
+            "D. Potier": 0,
+            "J. Sépa": 0
+        }
     }
 ]
