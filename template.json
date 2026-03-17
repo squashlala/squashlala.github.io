@@ -1,0 +1,16 @@
+[
+    {
+        "bureau": "01", 
+        "coordonnees": [49.504090, 4.457693],
+        "nom": "Mairie",
+        "inscrits": 390,
+        "votants": 205,
+        "nuls": 18,
+        "blancs": 23,
+        "exprimé": 164,
+        "candidats": {
+            "D. Potier": 205,
+            "J. Sépa": 0
+        }
+    }
+]
