@@ -37,6 +37,7 @@
         #map {
             flex: 1;
             height: 100%;
+            z-index: 1;
         }
         
         .control-group {
@@ -104,6 +105,7 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid #e0e0e0;
+            text-transform: uppercase; /* Met le texte en majuscules */
         }
         
         .candidate-item:hover {
@@ -121,7 +123,7 @@
             background: white;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin: 15px 0;
         }
         
@@ -237,8 +239,12 @@
                         <i class="fas fa-chart-bar"></i> Visualiser par candidat
                     </label>
                     <label>
-                        <input type="radio" name="display-mode" value="participation"> 
-                        <i class="fas fa-percent"></i> Taux de participation
+                        <input type="radio" name="display-mode" value="abstention"> 
+                        <i class="fas fa-user-slash"></i> Taux d'abstention
+                    </label>
+                    <label>
+                        <input type="radio" name="display-mode" value="majority"> 
+                        <i class="fas fa-vote-yea"></i> Majorité par bureau
                     </label>
                 </div>
                 
@@ -249,543 +255,641 @@
                     <p>Sélectionnez un candidat</p>
                 </div>
                 
-                <div class="legend">
-                    <h4>Légende - Intensité des voix</h4>
-                    <div class="legend-item">
-                        <div class="color-box" style="background: #0000ff;"></div>
-                        <span>Faible</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="color-box" style="background: #00ffff;"></div>
-                        <span>Moyen-faible</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="color-box" style="background: #00ff00;"></div>
-                        <span>Moyen</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="color-box" style="background: #ffff00;"></div>
-                        <span>Moyen-fort</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="color-box" style="background: #ff0000;"></div>
-                        <span>Fort</span>
-                    </div>
-                </div>
+                <div id="legend-container"></div>
                 
                 <button id="refresh-map"><i class="fas fa-sync-alt"></i> Actualiser la carte</button>
+                <button id="reset-view"><i class="fas fa-globe"></i> Réinitialiser la vue</button>
+            </div>
+            <div class="control-group">
+                <h3>Attention :</h3>
+                <p>Ce site a été réalisé à l'aide de l'intelligence artificielle. <b>Des anomalies dans la réprésentation des données peuvent exister.</b></p>
+                <br>
+                <h3>Sources :</h3>
+                <p>Résultats des votes (1er tour)</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-a-reims-resultats-definitifs-du-1er-tour">Ville de Reims | Élections municipales à Reims : résultats définitifs du 1er tour</a>
+                <p>Liste des bureaux de vote :</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-les-15-et-22-mars-2026">Ville de Reims | Élections municipales 2026</a>
             </div>
         </div>
         
         <div id="map"></div>
     </div>
+
     <script>
-    // Variables globales
-    let map;
-    let heatLayer = null;
-    let markers = [];
-    let currentData = null;
-    let candidatesList = [];
-    let currentCandidate = null;
-    let currentMode = 'candidates';
+        // Variables globales
+        let map;
+        let heatLayer = null;
+        let markers = [];
+        let currentData = null;
+        let candidatesList = [];
+        let currentCandidate = null;
+        let currentMode = 'candidates';
+        let legendControl = null;
 
-    // Palette de couleurs pour les candidats (maximum de contraste)
-    const candidateColors = [
-        '#FF0000', // Rouge vif
-        '#0000FF', // Bleu vif
-        '#00FF00', // Vert vif
-        '#FF00FF', // Magenta
-        '#FFA500', // Orange
-        '#800080', // Violet
-        '#008080', // Teal
-        '#FF1493', // Rose profond
-        '#32CD32', // Vert lime
-        '#FF4500', // Orange rouge
-        '#1E90FF', // Bleu dodger
-        '#DC143C', // Crimson
-        '#9400D3', // Violet foncé
-        '#2E8B57', // Vert océan
-        '#B8860B', // Ocre
-        '#4B0082', // Indigo
-        '#FF8C00', // Orange foncé
-        '#8B0000', // Rouge foncé
-        '#006400', // Vert foncé
-        '#8B008B'  // Magenta foncé
-    ];
+        // Palette de couleurs pour les candidats (maximum de contraste)
+        const candidateColors = [
+            '#FF0000', // Rouge vif
+            '#0000FF', // Bleu vif
+            '#00FF00', // Vert vif
+            '#FF00FF', // Magenta
+            '#FFA500', // Orange
+            '#800080', // Violet
+            '#008080', // Teal
+            '#FF1493', // Rose profond
+            '#32CD32', // Vert lime
+            '#FF4500', // Orange rouge
+            '#1E90FF', // Bleu dodger
+            '#DC143C', // Crimson
+            '#9400D3', // Violet foncé
+            '#2E8B57', // Vert océan
+            '#B8860B', // Ocre
+            '#4B0082', // Indigo
+            '#FF8C00', // Orange foncé
+            '#8B0000', // Rouge foncé
+            '#006400', // Vert foncé
+            '#8B008B'  // Magenta foncé
+        ];
 
-    // Fonction pour obtenir une couleur pour un candidat
-    function getCandidateColor(candidate, index) {
-        return candidateColors[index % candidateColors.length];
-    }
-
-    // Initialiser la carte
-    function initMap() {
-        map = L.map('map').setView([46.2276, 2.2137], 6);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 13,
-            minZoom:13
-        }).addTo(map);
-    }
-
-    // Fonction pour nettoyer la carte
-    function clearMap() {
-        if (heatLayer) {
-            map.removeLayer(heatLayer);
-            heatLayer = null;
+        // Fonction pour obtenir une couleur pour un candidat
+        function getCandidateColor(candidate, index) {
+            return candidateColors[index % candidateColors.length];
         }
-        
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-    }
 
-    // Traiter les données JSON
-    function processJSON(data) {
-        let processed = [];
-        
-        if (Array.isArray(data)) {
-            processed = data;
-        } else if (data.results && Array.isArray(data.results)) {
-            processed = data.results;
-        } else if (data.features && Array.isArray(data.features)) {
-            processed = data.features;
-        } else {
-            processed = [data];
-        }
-        
-        return processed;
-    }
-
-    // Traiter les données CSV
-    function processCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim());
-        if (lines.length < 2) return [];
-        
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-        const data = [];
-        
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
-            if (values.length !== headers.length) continue;
+        // Initialiser la carte
+        function initMap() {
+            map = L.map('map').setView([46.2276, 2.2137], 6);
             
-            const row = {};
-            headers.forEach((header, index) => {
-                let value = values[index];
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 13,
+                minZoom:13
+            }).addTo(map);
+        }
+
+        // Fonction pour nettoyer la carte et les légendes
+        function clearMap() {
+            if (heatLayer) {
+                map.removeLayer(heatLayer);
+                heatLayer = null;
+            }
+            
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            if (legendControl) {
+                map.removeControl(legendControl);
+                legendControl = null;
+            }
+        }
+
+        // Traiter les données JSON
+        function processJSON(data) {
+            let processed = [];
+            
+            if (Array.isArray(data)) {
+                processed = data;
+            } else if (data.results && Array.isArray(data.results)) {
+                processed = data.results;
+            } else if (data.features && Array.isArray(data.features)) {
+                processed = data.features;
+            } else {
+                processed = [data];
+            }
+            
+            return processed;
+        }
+
+        // Traiter les données CSV
+        function processCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                if (values.length !== headers.length) continue;
                 
-                if (value && !isNaN(value) && value !== '') {
-                    row[header] = parseFloat(value);
-                } 
-                else if (header === 'Geo' && value) {
-                    try {
-                        row[header] = JSON.parse(value);
-                    } catch {
+                const row = {};
+                headers.forEach((header, index) => {
+                    let value = values[index];
+                    
+                    if (value && !isNaN(value) && value !== '') {
+                        row[header] = parseFloat(value);
+                    } 
+                    else if (header === 'Geo' && value) {
+                        try {
+                            row[header] = JSON.parse(value);
+                        } catch {
+                            row[header] = value;
+                        }
+                    }
+                    else {
                         row[header] = value;
                     }
-                }
-                else {
-                    row[header] = value;
-                }
-            });
-            data.push(row);
-        }
-        
-        return data;
-    }
-
-    // Extraire les coordonnées d'un bureau
-    function getCoordinates(bureau) {
-        if (bureau.coordonnees && Array.isArray(bureau.coordonnees)) {
-            return bureau.coordonnees;
-        }
-        if (bureau.Geo && Array.isArray(bureau.Geo)) {
-            return bureau.Geo;
-        }
-        if (bureau.latitude && bureau.longitude) {
-            return [parseFloat(bureau.latitude), parseFloat(bureau.longitude)];
-        }
-        if (bureau.lat && bureau.lon) {
-            return [parseFloat(bureau.lat), parseFloat(bureau.lon)];
-        }
-        if (bureau.geometry && bureau.geometry.coordinates) {
-            return [bureau.geometry.coordinates[1], bureau.geometry.coordinates[0]];
-        }
-        return null;
-    }
-
-    // Extraire la valeur pour un candidat
-    function getCandidateValue(bureau, candidate) {
-        if (bureau.resultats_candidats && bureau.resultats_candidats[candidate] !== undefined) {
-            return bureau.resultats_candidats[candidate];
-        }
-        if (bureau.results && bureau.results[candidate] !== undefined) {
-            return bureau.results[candidate];
-        }
-        if (bureau[candidate] !== undefined) {
-            return bureau[candidate];
-        }
-        if (bureau.statistiques && bureau.statistiques[candidate] !== undefined) {
-            return bureau.statistiques[candidate];
-        }
-        return 0;
-    }
-
-    // Trouver le candidat majoritaire dans un bureau
-    function getMajorityCandidate(bureau) {
-        let maxVoix = -1;
-        let majoritaire = null;
-        
-        candidatesList.forEach(candidate => {
-            const voix = getCandidateValue(bureau, candidate);
-            if (voix > maxVoix) {
-                maxVoix = voix;
-                majoritaire = candidate;
-            }
-        });
-        
-        return { candidate: majoritaire, voix: maxVoix };
-    }
-
-    // Détecter les candidats dans les données
-    function detectCandidates(data) {
-        if (!data || data.length === 0) return [];
-        
-        const firstItem = data[0];
-        const excludeFields = [
-            'bureau', 'Bureau', 'name', 'Name', 'nom', 'Nom',
-            'Geo', 'geo', 'coordonnees', 'coordinates', 'lat', 'lon',
-            'latitude', 'longitude', 'address', 'adresse',
-            'inscrits', 'Inscrits', 'votants', 'Votants',
-            'nuls', 'Nuls', 'blancs', 'Blancs', 'exprimes', 'Exprimé',
-            'id', 'ID', 'description', 'type', 'status'
-        ];
-        
-        const candidates = [];
-        
-        for (const [key, value] of Object.entries(firstItem)) {
-            if (typeof value === 'number' && !excludeFields.includes(key)) {
-                candidates.push(key);
-            }
-        }
-        
-        if (candidates.length === 0) {
-            if (firstItem.resultats_candidats) {
-                Object.keys(firstItem.resultats_candidats).forEach(key => {
-                    if (typeof firstItem.resultats_candidats[key] === 'number') {
-                        candidates.push(key);
-                    }
                 });
+                data.push(row);
             }
-            if (firstItem.results) {
-                Object.keys(firstItem.results).forEach(key => {
-                    if (typeof firstItem.results[key] === 'number') {
-                        candidates.push(key);
-                    }
-                });
-            }
+            
+            return data;
         }
-        
-        return candidates;
-    }
 
-    // Mettre à jour la carte
-    function updateMap() {
-        clearMap();
-        
-        if (!currentData || currentData.length === 0) return;
-        
-        const heatPoints = [];
-        const bounds = [];
-        
-        if (currentMode === 'majority') {
-            // Mode majorité : chaque bureau a la couleur de son candidat majoritaire
-            currentData.forEach((bureau, index) => {
-                const coords = getCoordinates(bureau);
-                if (!coords) return;
-                
-                bounds.push(coords);
-                
-                const { candidate, voix } = getMajorityCandidate(bureau);
-                if (candidate) {
-                    const candidateIndex = candidatesList.indexOf(candidate);
-                    const color = getCandidateColor(candidate, candidateIndex);
-                    
-                    // Calculer l'intensité basée sur le pourcentage
-                    const total = candidatesList.reduce((sum, c) => sum + getCandidateValue(bureau, c), 0);
-                    const pourcentage = total > 0 ? (voix / total) * 100 : 0;
-                    
-                    // Taille du marqueur basée sur le pourcentage (plus le candidat est dominant, plus le cercle est gros)
-                    const radius = 8 + (pourcentage / 10);
-                    
-                    const marker = L.circleMarker([coords[0], coords[1]], {
-                        radius: radius,
-                        color: '#000',
-                        weight: 2,
-                        fillColor: color,
-                        fillOpacity: 0.9
-                    }).bindPopup(`
-                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
-                        ${bureau.address || bureau.Adresse || ''}<br>
-                        <b>Candidat majoritaire:</b> ${candidate}<br>
-                        <b>Voix:</b> ${voix}<br>
-                        <b>Pourcentage:</b> ${pourcentage.toFixed(1)}%<br>
-                        <hr>
-                        ${candidatesList.map(c => {
-                            const v = getCandidateValue(bureau, c);
-                            return `<b>${c}:</b> ${v} (${total > 0 ? ((v/total)*100).toFixed(1) : 0}%)<br>`;
-                        }).join('')}
-                    `);
-                    
-                    marker.addTo(map);
-                    markers.push(marker);
+        // Extraire les coordonnées d'un bureau
+        function getCoordinates(bureau) {
+            if (bureau.coordonnees && Array.isArray(bureau.coordonnees)) {
+                return bureau.coordonnees;
+            }
+            if (bureau.Geo && Array.isArray(bureau.Geo)) {
+                return bureau.Geo;
+            }
+            if (bureau.latitude && bureau.longitude) {
+                return [parseFloat(bureau.latitude), parseFloat(bureau.longitude)];
+            }
+            if (bureau.lat && bureau.lon) {
+                return [parseFloat(bureau.lat), parseFloat(bureau.lon)];
+            }
+            if (bureau.geometry && bureau.geometry.coordinates) {
+                return [bureau.geometry.coordinates[1], bureau.geometry.coordinates[0]];
+            }
+            return null;
+        }
+
+        // Extraire la valeur pour un candidat
+        function getCandidateValue(bureau, candidate) {
+            if (bureau.resultats_candidats && bureau.resultats_candidats[candidate] !== undefined) {
+                return bureau.resultats_candidats[candidate];
+            }
+            if (bureau.results && bureau.results[candidate] !== undefined) {
+                return bureau.results[candidate];
+            }
+            if (bureau[candidate] !== undefined) {
+                return bureau[candidate];
+            }
+            if (bureau.statistiques && bureau.statistiques[candidate] !== undefined) {
+                return bureau.statistiques[candidate];
+            }
+            return 0;
+        }
+
+        // Trouver le candidat majoritaire dans un bureau
+        function getMajorityCandidate(bureau) {
+            let maxVoix = -1;
+            let majoritaire = null;
+            
+            candidatesList.forEach(candidate => {
+                const voix = getCandidateValue(bureau, candidate);
+                if (voix > maxVoix) {
+                    maxVoix = voix;
+                    majoritaire = candidate;
                 }
-            });
-        } else {
-            // Mode normal (heatmap)
-            currentData.forEach(bureau => {
-                const coords = getCoordinates(bureau);
-                if (!coords) return;
-                
-                bounds.push(coords);
-                
-                let value = 0;
-                
-                if (currentMode === 'candidates' && currentCandidate) {
-                    value = getCandidateValue(bureau, currentCandidate);
-                } else if (currentMode === 'participation') {
-                    const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits || 0;
-                    const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants || 0;
-                    if (inscrits > 0) {
-                        value = (votants / inscrits) * 100;
-                    }
-                }
-                
-                if (value > 0) {
-                    heatPoints.push([coords[0], coords[1], value]);
-                }
-                
-                // Marqueur standard avec popup
-                const marker = L.circleMarker([coords[0], coords[1]], {
-                    radius: 3,
-                    color: '#333',
-                    weight: 1,
-                    fillColor: '#667eea',
-                    fillOpacity: 0.1
-                }).bindPopup(`
-                    <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
-                    ${bureau.address || bureau.Adresse || ''}<br>
-                    <b>${currentCandidate || 'Votes'}:</b> ${value}<br>
-                    <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
-                `);
-                
-                marker.addTo(map);
-                markers.push(marker);
             });
             
-            // Ajouter la couche de chaleur avec meilleur contraste
-            if (heatPoints.length > 0) {
-                const maxValue = Math.max(...heatPoints.map(p => p[2]));
-                const normalizedPoints = heatPoints.map(p => [
-                    p[0],
-                    p[1],
-                    p[2] / maxValue
-                ]);
-                
-                heatLayer = L.heatLayer(normalizedPoints, {
-                    radius: 50,
-                    // blur: 100,
-                    maxZoom: 15,
-                    gradient: {
-                        0.0: '#0000FF',     // Bleu foncé
-                        0.1: '#0066FF',      // Bleu moyen
-                        0.2: '#00CCFF',      // Bleu clair
-                        0.3: '#00FFCC',      // Turquoise
-                        0.4: '#00FF66',      // Vert
-                        0.5: '#66FF00',      // Vert clair
-                        0.6: '#CCFF00',      // Jaune-vert
-                        0.7: '#FFFF00',      // Jaune
-                        0.8: '#FFCC00',      // Orange-jaune
-                        0.9: '#FF6600',      // Orange
-                        1.0: '#FF0000'       // Rouge vif
-                    }
-                }).addTo(map);
-            }
+            return { candidate: majoritaire, voix: maxVoix };
         }
-        
-        // Ajouter une légende pour le mode majorité
-        if (currentMode === 'majority') {
-            const legend = L.control({ position: 'bottomright' });
+
+        // Détecter les candidats dans les données
+        function detectCandidates(data) {
+            if (!data || data.length === 0) return [];
             
-            legend.onAdd = function(map) {
+            const firstItem = data[0];
+            const excludeFields = [
+                'bureau', 'Bureau', 'name', 'Name', 'nom', 'Nom',
+                'Geo', 'geo', 'coordonnees', 'coordinates', 'lat', 'lon',
+                'latitude', 'longitude', 'address', 'adresse',
+                'inscrits', 'Inscrits', 'votants', 'Votants',
+                'nuls', 'Nuls', 'blancs', 'Blancs', 
+                'exprimes', 'Exprimé', 'exprimé', 'EXPRIMÉ', // Ajout de toutes les variantes
+                'id', 'ID', 'description', 'type', 'status'
+            ];
+            
+            const candidates = [];
+            
+            for (const [key, value] of Object.entries(firstItem)) {
+                if (typeof value === 'number' && !excludeFields.includes(key)) {
+                    candidates.push(key);
+                }
+            }
+            
+            if (candidates.length === 0) {
+                if (firstItem.resultats_candidats) {
+                    Object.keys(firstItem.resultats_candidats).forEach(key => {
+                        if (typeof firstItem.resultats_candidats[key] === 'number') {
+                            candidates.push(key);
+                        }
+                    });
+                }
+                if (firstItem.results) {
+                    Object.keys(firstItem.results).forEach(key => {
+                        if (typeof firstItem.results[key] === 'number') {
+                            candidates.push(key);
+                        }
+                    });
+                }
+            }
+            
+            return candidates;
+        }
+
+        // Ajouter une légende
+        function addLegend(title, items) {
+            legendControl = L.control({ position: 'bottomright' });
+            
+            legendControl.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'info legend');
                 div.style.backgroundColor = 'white';
                 div.style.padding = '10px';
                 div.style.borderRadius = '5px';
                 div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                div.style.maxHeight = '300px';
+                div.style.overflowY = 'auto';
                 
-                div.innerHTML = '<h4 style="margin-bottom: 10px;">Candidats majoritaires</h4>';
+                let html = `<h4 style="margin-bottom: 10px;">${title}</h4>`;
                 
-                candidatesList.forEach((candidate, index) => {
-                    const color = getCandidateColor(candidate, index);
-                    div.innerHTML += `
+                items.forEach(item => {
+                    html += `
                         <div style="display: flex; align-items: center; margin: 5px 0;">
-                            <div style="width: 20px; height: 20px; background: ${color}; margin-right: 10px; border: 1px solid #000;"></div>
-                            <span>${candidate}</span>
+                            <div style="width: 20px; height: 20px; background: ${item.color}; margin-right: 10px; border: 1px solid #000;"></div>
+                            <span>${item.label}</span>
                         </div>
                     `;
                 });
                 
-                div.innerHTML += '<hr><p style="font-size: 0.8em; margin-top: 5px;">La taille des cercles indique le % de voix</p>';
-                
+                div.innerHTML = html;
                 return div;
             };
             
-            legend.addTo(map);
+            legendControl.addTo(map);
         }
-        
-        // Ajuster la vue
-        if (bounds.length > 0) {
-            const lats = bounds.map(b => b[0]);
-            const lngs = bounds.map(b => b[1]);
-            const southWest = [Math.min(...lats), Math.min(...lngs)];
-            const northEast = [Math.max(...lats), Math.max(...lngs)];
-            map.fitBounds([southWest, northEast], { padding: [50, 50] });
-        }
-        
-        updateStats();
-    }
 
-    // Mettre à jour les statistiques
-    function updateStats() {
-        if (!currentData || !currentCandidate) return;
-        
-        let total = 0;
-        let max = 0;
-        let maxBureau = '';
-        
-        currentData.forEach(bureau => {
-            const value = getCandidateValue(bureau, currentCandidate);
-            total += value;
+        // Mettre à jour la carte
+        function updateMap() {
+            clearMap();
             
-            if (value > max) {
-                max = value;
-                maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
+            if (!currentData || currentData.length === 0) return;
+            
+            const heatPoints = [];
+            const bounds = [];
+            
+            if (currentMode === 'majority') {
+                // Mode majorité : chaque bureau a la couleur de son candidat majoritaire
+                currentData.forEach((bureau) => {
+                    const coords = getCoordinates(bureau);
+                    if (!coords) return;
+                    
+                    bounds.push(coords);
+                    
+                    const { candidate, voix } = getMajorityCandidate(bureau);
+                    if (candidate) {
+                        const candidateIndex = candidatesList.indexOf(candidate);
+                        const color = getCandidateColor(candidate, candidateIndex);
+                        
+                        // Calculer l'intensité basée sur le pourcentage
+                        const total = candidatesList.reduce((sum, c) => sum + getCandidateValue(bureau, c), 0);
+                        const pourcentage = total > 0 ? (voix / total) * 100 : 0;
+                        
+                        // Taille du marqueur basée sur le pourcentage
+                        const radius = 8 + (pourcentage / 10);
+                        
+                        const marker = L.circleMarker([coords[0], coords[1]], {
+                            radius: radius,
+                            color: '#000',
+                            weight: 2,
+                            fillColor: color,
+                            fillOpacity: 0.9
+                        }).bindPopup(`
+                            <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
+                            ${bureau.address || bureau.Adresse || ''}<br>
+                            <b>Candidat majoritaire:</b> ${candidate}<br>
+                            <b>Voix:</b> ${voix}<br>
+                            <b>Pourcentage:</b> ${pourcentage.toFixed(1)}%<br>
+                            <hr>
+                            ${candidatesList.map(c => {
+                                const v = getCandidateValue(bureau, c);
+                                return `<b>${c}:</b> ${v} (${total > 0 ? ((v/total)*100).toFixed(1) : 0}%)<br>`;
+                            }).join('')}
+                        `);
+                        
+                        marker.addTo(map);
+                        markers.push(marker);
+                    }
+                });
+                
+                // Ajouter la légende pour la majorité
+                const legendItems = candidatesList.map((candidate, index) => ({
+                    color: getCandidateColor(candidate, index),
+                    label: candidate.toUpperCase() // Affichage en majuscules
+                }));
+                legendItems.push({ color: '#FFFFFF', label: 'La taille des cercles indique le % de voix' });
+                addLegend('Candidats majoritaires', legendItems);
+                
+            } else if (currentMode === 'abstention') {
+                // Mode abstention
+                currentData.forEach(bureau => {
+                    const coords = getCoordinates(bureau);
+                    if (!coords) return;
+                    
+                    bounds.push(coords);
+                    
+                    // Calculer l'abstention
+                    const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits || 0;
+                    const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants || 0;
+                    
+                    let abstention = 0;
+                    if (inscrits > 0) {
+                        abstention = ((inscrits - votants) / inscrits) * 100;
+                    }
+                    
+                    heatPoints.push([coords[0], coords[1], abstention]);
+                    
+                    // Marqueur standard avec popup
+                    const marker = L.circleMarker([coords[0], coords[1]], {
+                        radius: 3,
+                        color: '#333',
+                        weight: 1,
+                        fillColor: '#667eea',
+                        fillOpacity: 0.1
+                    }).bindPopup(`
+                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
+                        ${bureau.address || bureau.Adresse || ''}<br>
+                        <b>Taux d'abstention:</b> ${abstention.toFixed(1)}%<br>
+                        <b>Inscrits:</b> ${inscrits}<br>
+                        <b>Votants:</b> ${votants}<br>
+                        <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
+                    `);
+                    
+                    marker.addTo(map);
+                    markers.push(marker);
+                });
+                
+                // Ajouter la couche de chaleur pour l'abstention
+                if (heatPoints.length > 0) {
+                    const maxValue = Math.max(...heatPoints.map(p => p[2]));
+                    const normalizedPoints = heatPoints.map(p => [
+                        p[0],
+                        p[1],
+                        p[2] / maxValue
+                    ]);
+                    
+                    heatLayer = L.heatLayer(normalizedPoints, {
+                        radius: 50,
+                        maxZoom: 15,
+                        gradient: {
+                            0.0: '#00FF00',  // Vert (faible abstention)
+                            0.2: '#CCFF00',  // Jaune-vert
+                            0.4: '#FFFF00',  // Jaune
+                            0.6: '#FFCC00',  // Orange-jaune
+                            0.8: '#FF9900',  // Orange
+                            1.0: '#FF0000'   // Rouge (forte abstention)
+                        }
+                    }).addTo(map);
+                }
+                
+                // Ajouter la légende pour l'abstention
+                addLegend('Taux d\'abstention', [
+                    { color: '#00FF00', label: 'Faible' },
+                    { color: '#CCFF00', label: 'Moyen-faible' },
+                    { color: '#FFFF00', label: 'Moyen' },
+                    { color: '#FFCC00', label: 'Moyen-fort' },
+                    { color: '#FF9900', label: 'Fort' },
+                    { color: '#FF0000', label: 'Très fort' }
+                ]);
+                
+            } else {
+                // Mode normal (heatmap candidats ou participation)
+                currentData.forEach(bureau => {
+                    const coords = getCoordinates(bureau);
+                    if (!coords) return;
+                    
+                    bounds.push(coords);
+                    
+                    let value = 0;
+                    
+                    if (currentMode === 'candidates' && currentCandidate) {
+                        value = getCandidateValue(bureau, currentCandidate);
+                    } else if (currentMode === 'participation') {
+                        const inscrits = bureau.Inscrits || bureau.inscrits || bureau.statistiques?.inscrits || 0;
+                        const votants = bureau.Votants || bureau.votants || bureau.statistiques?.votants || 0;
+                        if (inscrits > 0) {
+                            value = (votants / inscrits) * 100;
+                        }
+                    }
+                    
+                    if (value > 0) {
+                        heatPoints.push([coords[0], coords[1], value]);
+                    }
+                    
+                    // Marqueur standard avec popup
+                    const marker = L.circleMarker([coords[0], coords[1]], {
+                        radius: 3,
+                        color: '#333',
+                        weight: 1,
+                        fillColor: '#667eea',
+                        fillOpacity: 0.1
+                    }).bindPopup(`
+                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
+                        ${bureau.address || bureau.Adresse || ''}<br>
+                        <b>${currentCandidate || 'Votes'}:</b> ${value}<br>
+                        <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
+                    `);
+                    
+                    marker.addTo(map);
+                    markers.push(marker);
+                });
+                
+                // Ajouter la couche de chaleur avec meilleur contraste
+                if (heatPoints.length > 0) {
+                    const maxValue = Math.max(...heatPoints.map(p => p[2]));
+                    const normalizedPoints = heatPoints.map(p => [
+                        p[0],
+                        p[1],
+                        p[2] / maxValue
+                    ]);
+                    
+                    heatLayer = L.heatLayer(normalizedPoints, {
+                        radius: 50,
+                        maxZoom: 15,
+                        gradient: {
+                            0.0: '#0000FF',     // Bleu foncé
+                            0.1: '#0066FF',      // Bleu moyen
+                            0.2: '#00CCFF',      // Bleu clair
+                            0.3: '#00FFCC',      // Turquoise
+                            0.4: '#00FF66',      // Vert
+                            0.5: '#66FF00',      // Vert clair
+                            0.6: '#CCFF00',      // Jaune-vert
+                            0.7: '#FFFF00',      // Jaune
+                            0.8: '#FFCC00',      // Orange-jaune
+                            0.9: '#FF6600',      // Orange
+                            1.0: '#FF0000'       // Rouge vif
+                        }
+                    }).addTo(map);
+                }
+                
+                // Ajouter la légende pour le mode normal
+                if (currentMode === 'candidates' && currentCandidate) {
+                    addLegend(`Intensité - ${currentCandidate.toUpperCase()}`, [
+                        { color: '#0000FF', label: 'Faible' },
+                        { color: '#00FF00', label: 'Moyen' },
+                        { color: '#FFFF00', label: 'Fort' },
+                        { color: '#FF0000', label: 'Très fort' }
+                    ]);
+                } else if (currentMode === 'participation') {
+                    addLegend('Taux de participation', [
+                        { color: '#0000FF', label: 'Faible' },
+                        { color: '#00FF00', label: 'Moyen' },
+                        { color: '#FFFF00', label: 'Fort' },
+                        { color: '#FF0000', label: 'Très fort' }
+                    ]);
+                }
             }
-        });
-        
-        const statsDiv = document.getElementById('stats');
-        statsDiv.innerHTML = `
-            <h4>Statistiques - ${currentCandidate}</h4>
-            <p><strong>Total voix:</strong> ${total}</p>
-            <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
-            <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
-            <p><strong>Bureaux:</strong> ${currentData.length}</p>
-        `;
-    }
+            
+            // Ajuster la vue
+            if (bounds.length > 0) {
+                const lats = bounds.map(b => b[0]);
+                const lngs = bounds.map(b => b[1]);
+                const southWest = [Math.min(...lats), Math.min(...lngs)];
+                const northEast = [Math.max(...lats), Math.max(...lngs)];
+                map.fitBounds([southWest, northEast], { padding: [50, 50] });
+            }
+            
+            updateStats();
+        }
 
-    // Mettre à jour la liste des candidats
-    function updateCandidatesList() {
-        const container = document.getElementById('candidate-list');
-        container.innerHTML = '';
-        
-        candidatesList.forEach(candidate => {
-            const div = document.createElement('div');
-            div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
-            div.textContent = candidate;
-            div.onclick = () => {
-                document.querySelectorAll('.candidate-item').forEach(el => 
-                    el.classList.remove('selected'));
-                div.classList.add('selected');
-                currentCandidate = candidate;
-                updateMap();
+        // Mettre à jour les statistiques
+        function updateStats() {
+            if (!currentData || !currentCandidate) return;
+            
+            let total = 0;
+            let max = 0;
+            let maxBureau = '';
+            
+            currentData.forEach(bureau => {
+                const value = getCandidateValue(bureau, currentCandidate);
+                total += value;
+                
+                if (value > max) {
+                    max = value;
+                    maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
+                }
+            });
+            
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = `
+                <h4>Statistiques - ${currentCandidate.toUpperCase()}</h4>
+                <p><strong>Total voix:</strong> ${total}</p>
+                <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
+                <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
+                <p><strong>Bureaux:</strong> ${currentData.length}</p>
+            `;
+        }
+
+        // Mettre à jour la liste des candidats
+        function updateCandidatesList() {
+            const container = document.getElementById('candidate-list');
+            container.innerHTML = '';
+            
+            candidatesList.forEach(candidate => {
+                const div = document.createElement('div');
+                div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
+                div.textContent = candidate.toUpperCase(); // Affichage en majuscules
+                div.onclick = () => {
+                    document.querySelectorAll('.candidate-item').forEach(el => 
+                        el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    currentCandidate = candidate;
+                    if (currentMode === 'candidates') {
+                        updateMap();
+                    }
+                };
+                container.appendChild(div);
+            });
+        }
+
+        // Gestionnaire d'upload
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    let data;
+                    
+                    if (file.name.endsWith('.json')) {
+                        const jsonData = JSON.parse(e.target.result);
+                        data = processJSON(jsonData);
+                    } else if (file.name.endsWith('.csv')) {
+                        data = processCSV(e.target.result);
+                    } else {
+                        throw new Error('Format non supporté');
+                    }
+                    
+                    if (data.length === 0) {
+                        throw new Error('Aucune donnée trouvée');
+                    }
+                    
+                    currentData = data;
+                    candidatesList = detectCandidates(data);
+                    
+                    if (candidatesList.length > 0) {
+                        currentCandidate = candidatesList[0];
+                    }
+                    
+                    document.getElementById('candidates-panel').style.display = 'block';
+                    document.getElementById('file-info').innerHTML = 
+                        `<span class="success"><i class="fas fa-check"></i> ${data.length} bureaux chargés, ${candidatesList.length} candidats trouvés</span>`;
+                    
+                    updateCandidatesList();
+                    updateMap();
+                    
+                } catch (error) {
+                    document.getElementById('file-info').innerHTML = 
+                        `<span class="error"><i class="fas fa-exclamation-triangle"></i> Erreur: ${error.message}</span>`;
+                }
             };
-            container.appendChild(div);
-        });
-    }
-
-    // Gestionnaire d'upload
-    document.getElementById('file-input').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            try {
-                let data;
-                
-                if (file.name.endsWith('.json')) {
-                    const jsonData = JSON.parse(e.target.result);
-                    data = processJSON(jsonData);
-                } else if (file.name.endsWith('.csv')) {
-                    data = processCSV(e.target.result);
-                } else {
-                    throw new Error('Format non supporté');
-                }
-                
-                if (data.length === 0) {
-                    throw new Error('Aucune donnée trouvée');
-                }
-                
-                currentData = data;
-                candidatesList = detectCandidates(data);
-                
-                if (candidatesList.length > 0) {
-                    currentCandidate = candidatesList[0];
-                }
-                
-                document.getElementById('candidates-panel').style.display = 'block';
-                document.getElementById('file-info').innerHTML = 
-                    `<span class="success"><i class="fas fa-check"></i> ${data.length} bureaux chargés, ${candidatesList.length} candidats trouvés</span>`;
-                
-                updateCandidatesList();
-                updateMap();
-                
-            } catch (error) {
-                document.getElementById('file-info').innerHTML = 
-                    `<span class="error"><i class="fas fa-exclamation-triangle"></i> Erreur: ${error.message}</span>`;
-            }
-        };
-        
-        if (file.name.endsWith('.json') || file.name.endsWith('.csv')) {
-            reader.readAsText(file);
-        }
-    });
-
-    // Gestionnaire des modes
-    document.querySelectorAll('input[name="display-mode"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            currentMode = this.value;
             
-            if (currentMode === 'candidates') {
-                document.getElementById('candidate-list').style.display = 'block';
-                if (currentCandidate) {
+            if (file.name.endsWith('.json') || file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            }
+        });
+
+        // Gestionnaire des modes
+        document.querySelectorAll('input[name="display-mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentMode = this.value;
+                
+                if (currentMode === 'candidates') {
+                    document.getElementById('candidate-list').style.display = 'block';
+                } else {
+                    document.getElementById('candidate-list').style.display = 'none';
+                }
+                
+                if (currentData) {
                     updateMap();
                 }
-            } else if (currentMode === 'majority') {
-                document.getElementById('candidate-list').style.display = 'none';
-                updateMap();
-            } else {
-                document.getElementById('candidate-list').style.display = 'none';
+            });
+        });
+
+        // Bouton actualiser
+        document.getElementById('refresh-map').addEventListener('click', function() {
+            if (currentData) {
                 updateMap();
             }
         });
-    });
 
-    // Bouton actualiser
-    document.getElementById('refresh-map').addEventListener('click', function() {
-        if (currentData) {
-            updateMap();
-        }
-    });
+        // Bouton réinitialiser la vue
+        document.getElementById('reset-view').addEventListener('click', function() {
+            if (currentData && currentData.length > 0) {
+                updateMap();
+            }
+        });
 
-    // Initialiser la carte au chargement
-    initMap();
+        // Initialiser la carte au chargement
+        initMap();
 
-    // Données d'exemple
-    setTimeout(() => {
-        const voteData = [
-            {
+        // Données d'exemple
+        setTimeout(() => {
+            const exempleData = [
+  {
     "bureau": "101",
     "coordonnees": [
       49.2584032,
@@ -2905,26 +3009,22 @@
     "mura": 1,
     "lang": 14
   }
-        ];
-        
-        currentData = voteData;
-        candidatesList = detectCandidates(voteData);
-        
-        if (candidatesList.length > 0) {
-            currentCandidate = candidatesList[0];
-        }
-        
-        document.getElementById('candidates-panel').style.display = 'block';
-        document.getElementById('file-info').innerHTML = 
-            '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
-        
-        updateCandidatesList();
-        updateMap();
-        map.on('zoomend', function (e) {
-    console.log(e.target._zoom);
-});
-    }, 1000);
-    
-</script>
+];
+            
+            currentData = exempleData;
+            candidatesList = detectCandidates(exempleData);
+            
+            if (candidatesList.length > 0) {
+                currentCandidate = candidatesList[0];
+            }
+            
+            document.getElementById('candidates-panel').style.display = 'block';
+            document.getElementById('file-info').innerHTML = 
+                '<span class="success"><i class="fas fa-info-circle"></i> Données exemple chargées</span>';
+            
+            updateCandidatesList();
+            updateMap();
+        }, 1000);
+    </script>
 </body>
 </html>
