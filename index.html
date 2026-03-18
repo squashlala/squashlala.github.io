@@ -74,7 +74,6 @@
             border: none;
             cursor: pointer;
             font-weight: 600;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
         
@@ -105,7 +104,6 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid #e0e0e0;
-            text-transform: uppercase; /* Met le texte en majuscules */
         }
         
         .candidate-item:hover {
@@ -321,11 +319,9 @@
 
         // Initialiser la carte
         function initMap() {
-            map = L.map('map').setView([46.2276, 2.2137], 6);
-            
+            map = L.map('map').setView([46.539724, 2.430270], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 13
+                attribution: '© OpenStreetMap contributors'
             }).addTo(map);
         }
 
@@ -493,11 +489,13 @@
         }
 
         // Mettre à jour la carte
-        function updateMap() {
+        async function updateMap() {
             clearMap();
             if (!currentData || currentData.length === 0) return;
             const heatPoints = [];
             const bounds = [];
+            
+            
             
             if (currentMode === 'majority') {
                 // Mode majorité : chaque bureau a la couleur de son candidat majoritaire
@@ -508,16 +506,16 @@
                     bounds.push(coords);
                     
                     const { candidate, voix } = getMajorityCandidate(bureau);
-                    console.log(candidate, voix)
                     if (candidate) {
                         const candidateIndex = candidatesList.indexOf(candidate);
                         const color = getCandidateColor(candidate, candidateIndex);
                         // Calculer l'intensité basée sur le pourcentage
-                        const total = candidatesList.reduce((sum, c) => sum + getCandidateValue(bureau, c), 0);
+                        const total = candidatesList.reduce((sum, c) => sum + getCandidateValue(bureau.candidats, c), 0);
                         const pourcentage = total > 0 ? (voix / total) * 100 : 0;
                         
+                        console.log(total, voix)
                         // Taille du marqueur basée sur le pourcentage
-                        const radius = 8 + (pourcentage / 10);
+                        const radius = 1+ (pourcentage / 2);
                         
                         const marker = L.circleMarker([coords[0], coords[1]], {
                             radius: radius,
@@ -526,18 +524,17 @@
                             fillColor: color,
                             fillOpacity: 0.9
                         }).bindPopup(`
-                            <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
-                            ${bureau.address || bureau.Adresse || ''}<br>
+                            <b>${bureau.nom}</b><br>
+                            ${bureau.adresse || ''}<br>
                             <b>Candidat majoritaire:</b> ${candidate}<br>
                             <b>Voix:</b> ${voix}<br>
                             <b>Pourcentage:</b> ${pourcentage.toFixed(1)}%<br>
                             <hr>
                             ${candidatesList.map(c => {
-                                const v = getCandidateValue(bureau, c);
+                                const v = getCandidateValue(bureau.candidats, c);
                                 return `<b>${c}:</b> ${v} (${total > 0 ? ((v/total)*100).toFixed(1) : 0}%)<br>`;
                             }).join('')}
                         `);
-                        
                         marker.addTo(map);
                         markers.push(marker);
                     }
@@ -546,7 +543,7 @@
                 // Ajouter la légende pour la majorité
                 const legendItems = candidatesList.map((candidate, index) => ({
                     color: getCandidateColor(candidate, index),
-                    label: candidate.toUpperCase() // Affichage en majuscules
+                    label: candidate // Affichage en majuscules
                 }));
                 legendItems.push({ color: '#FFFFFF', label: 'La taille des cercles indique le % de voix' });
                 addLegend('Candidats majoritaires', legendItems);
@@ -579,8 +576,8 @@
                         fillColor: '#667eea',
                         fillOpacity: 0.1
                     }).bindPopup(`
-                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
-                        ${bureau.address || bureau.Adresse || ''}<br>
+                        <b>${bureau.nom || bureau.id}</b><br>
+                        ${bureau.adresse || ''}<br>
                         <b>Taux d'abstention:</b> ${abstention.toFixed(1)}%<br>
                         <b>Inscrits:</b> ${inscrits}<br>
                         <b>Votants:</b> ${votants}<br>
@@ -610,7 +607,7 @@
                             0.6: '#FFCC00',  // Orange-jaune
                             0.8: '#FF9900',  // Orange
                             1.0: '#FF0000'   // Rouge (forte abstention)
-                        }
+                        },
                     }).addTo(map);
                 }
                 
@@ -657,8 +654,8 @@
                         fillColor: '#667eea',
                         fillOpacity: 0.1
                     }).bindPopup(`
-                        <b>${bureau.Bureau || bureau.name || bureau.bureau || 'Bureau'}</b><br>
-                        ${bureau.address || bureau.Adresse || ''}<br>
+                        <b>${bureau.nom}</b><br>
+                        ${bureau.adresse || ''}<br>
                         <b>${currentCandidate || 'Votes'}:</b> ${value}<br>
                         <b>Coordonnées:</b> ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}
                     `);
@@ -677,7 +674,7 @@
                     ]);
                     
                     heatLayer = L.heatLayer(normalizedPoints, {
-                        radius: 50,
+                        radius: 40,
                         maxZoom: 15,
                         gradient: {
                             0.0: '#0000FF',     // Bleu foncé
@@ -697,7 +694,7 @@
                 
                 // Ajouter la légende pour le mode normal
                 if (currentMode === 'candidates' && currentCandidate) {
-                    addLegend(`Intensité - ${currentCandidate.toUpperCase()}`, [
+                    addLegend(`Intensité - ${currentCandidate}`, [
                         { color: '#0000FF', label: 'Faible' },
                         { color: '#00FF00', label: 'Moyen' },
                         { color: '#FFFF00', label: 'Fort' },
@@ -719,11 +716,10 @@
                 const lngs = bounds.map(b => b[1]);
                 const southWest = [Math.min(...lats), Math.min(...lngs)];
                 const northEast = [Math.max(...lats), Math.max(...lngs)];
-                map.fitBounds([southWest, northEast], { padding: [50, 50] });
-            }
-            
-            if (["abstention", "majority"].includes(currentMode)){}
+                await map.fitBounds([southWest, northEast], { padding: [10, 10], maxZoom: 13});
+            }            
             updateStats();
+            
         }
 
         // Mettre à jour les statistiques
@@ -740,7 +736,7 @@
                 
                 if (value > max) {
                     max = value;
-                    maxBureau = bureau.Bureau || bureau.name || bureau.bureau || 'Inconnu';
+                    maxBureau = bureau.nom || bureau.bureau || 'Inconnu';
                 }
             });
             
@@ -757,7 +753,7 @@
             }
             else {
               statsDiv.innerHTML = `
-                  <h4>Statistiques - ${currentCandidate.toUpperCase()}</h4>
+                  <h4>Statistiques - ${currentCandidate}</h4>
                   <p><strong>Total voix:</strong> ${total}</p>
                   <p><strong>Moyenne par bureau:</strong> ${Math.round(total / currentData.length)}</p>
                   <p><strong>Maximum:</strong> ${max} (${maxBureau})</p>
@@ -773,7 +769,7 @@
             candidatesList.forEach(candidate => {
                 const div = document.createElement('div');
                 div.className = 'candidate-item' + (candidate === currentCandidate ? ' selected' : '');
-                div.textContent = candidate.toUpperCase();
+                div.textContent = candidate;
                 div.onclick = () => {
                     document.querySelectorAll('.candidate-item').forEach(el => 
                         el.classList.remove('selected'));
