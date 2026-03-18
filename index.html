@@ -262,15 +262,15 @@
             </div>
             <div class="control-group">
                 <h3>Modèle de données :</h3>
-                <p>Les données des votes peuvent être chargées sous forme de JSON en suivant le modèle : </p><a href="/template.json">template.json</a>
+                <p>Les données des votes peuvent être chargées sous forme de JSON en suivant le modèle : </p><a href="resources/template.json">template.json</a>
             </div>
             <div class="control-group">
                 <h3>Attention :</h3>
                 <p>Ce site a été réalisé à l'aide de l'intelligence artificielle. <b>Des anomalies dans la réprésentation des données peuvent exister.</b></p>
-                <!-- <br>
+                <br>
                 <h3>Sources :</h3>
                 <p>Résultats des votes (1er tour)</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-a-reims-resultats-definitifs-du-1er-tour">Ville de Reims | Élections municipales à Reims : résultats définitifs du 1er tour</a>
-                <p>Liste des bureaux de vote :</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-les-15-et-22-mars-2026">Ville de Reims | Élections municipales 2026</a> -->
+                <p>Liste des bureaux de vote :</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-les-15-et-22-mars-2026">Ville de Reims | Élections municipales 2026</a>
             </div>
         </div>
         
@@ -323,8 +323,7 @@
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors',
-                maxZoom: 13,
-                minZoom:13
+                maxZoom: 13
             }).addTo(map);
         }
 
@@ -902,7 +901,7 @@
               }
             ]
             
-            readJsonFile('/reims_T1.json')
+            readJsonFile('resources/reims_T1.json')
                 .then(data => {
                     currentData = data;
                     candidatesList = detectCandidates(currentData);
