@@ -271,6 +271,8 @@
                 <h3>Sources :</h3>
                 <p>Résultats des votes (1er tour)</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-a-reims-resultats-definitifs-du-1er-tour">Ville de Reims | Élections municipales à Reims : résultats définitifs du 1er tour</a>
                 <p>Liste des bureaux de vote :</p> <a href="https://www.reims.fr/a-la-une/une/elections-municipales-les-15-et-22-mars-2026">Ville de Reims | Élections municipales 2026</a>
+                <br>
+                <p>Les resultats ne sont pas représentés par quartiers mais par bureaux de votes. Le taux de voix, votants etc s'additionne à l'intersections des zones de chaque bureaux.</p>
             </div>
         </div>
         
@@ -418,9 +420,9 @@
 
         // Extraire la valeur pour un candidat
         function getCandidateValue(bureau, candidate) {
-            if (bureau.resultats_candidats && bureau.resultats_candidats[candidate] !== undefined) {
-                return bureau.resultats_candidats[candidate];
-            }
+            // if (bureau.resultats_candidats && bureau.resultats_candidats[candidate] !== undefined) {
+            //     return bureau.resultats_candidats[candidate];
+            // }
             if (bureau.results && bureau.results[candidate] !== undefined) {
                 return bureau.results[candidate];
             }
@@ -437,9 +439,10 @@
         function getMajorityCandidate(bureau) {
             let maxVoix = -1;
             let majoritaire = null;
-            
+
             candidatesList.forEach(candidate => {
-                const voix = getCandidateValue(bureau, candidate);
+                let voix = bureau.candidats[candidate]
+                if (!bureau.candidats[candidate]){voix=0}
                 if (voix > maxVoix) {
                     maxVoix = voix;
                     majoritaire = candidate;
@@ -504,7 +507,8 @@
                     
                     bounds.push(coords);
                     
-                    const { candidate, voix } = getMajorityCandidate(bureau.candidats);
+                    const { candidate, voix } = getMajorityCandidate(bureau);
+                    console.log(candidate, voix)
                     if (candidate) {
                         const candidateIndex = candidatesList.indexOf(candidate);
                         const color = getCandidateColor(candidate, candidateIndex);
@@ -741,7 +745,6 @@
             });
             
             const statsDiv = document.getElementById('stats');
-            console.log(currentMode)
             if (currentMode === 'abstention'){
               statsDiv.innerHTML = `
                 <p><strong>Bureaux:</strong> ${currentData.length}</p>
